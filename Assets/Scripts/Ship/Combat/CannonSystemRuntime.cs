@@ -659,7 +659,7 @@ public sealed class CannonSystemRuntime : MonoBehaviour
 
     private void OnValidate()
     {
-        CurrentReloadDuration =
+        reloadDuration =
             Mathf.Max(0.1f, reloadDuration);
     }
 }

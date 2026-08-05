@@ -44,19 +44,6 @@ public abstract class CannonAmmoDefinition : ScriptableObject
     [Min(0)]
     [SerializeField] private int crewDamage = 25;
 
-    [Header("Reload")]
-
-    [Tooltip(
-        "Множитель базового времени перезарядки пушки. " +
-        "1 — стандартное время, 1.3 — на 30% дольше, " +
-        "0.8 — на 20% быстрее.")]
-    [Min(0.1f)]
-    [SerializeField]
-    private float reloadDurationMultiplier = 1f;
-
-public float ReloadDurationMultiplier =>
-    Mathf.Max(0.1f, reloadDurationMultiplier);
-
     public string DisplayName =>
         string.IsNullOrWhiteSpace(displayName) ? name : displayName;
 
@@ -100,19 +87,6 @@ public float ReloadDurationMultiplier =>
         if (RoomDamage > 0)
         {
             targetRoom.TakeDamage(RoomDamage);
-        }
-    }
-
-    public float CurrentReloadDuration
-    {
-        get
-        {
-            float ammoMultiplier =
-                loadedAmmo != null
-                    ? loadedAmmo.ReloadDurationMultiplier
-                    : 1f;
-
-            return reloadDuration * ammoMultiplier;
         }
     }
 
