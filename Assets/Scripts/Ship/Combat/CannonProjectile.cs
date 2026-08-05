@@ -167,7 +167,10 @@ public sealed class CannonProjectile : MonoBehaviour
         if (targetRoom != null &&
             ammo != null)
         {
-            ammo.ApplyImpact(targetRoom);
+            ammo.ApplyImpact(
+                targetRoom,
+                transform.position
+            );
         }
 
         Destroy(gameObject);

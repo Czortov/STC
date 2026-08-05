@@ -12,8 +12,9 @@ public sealed class CannonSystemRuntime : MonoBehaviour
 
     [Header("Reload")]
 
-    [Min(0.1f)]
-    [SerializeField] private float reloadDuration = 3f;
+    [Tooltip("Base reload duration before applying the selected ammo multiplier.")]
+    [Min(0.01f)]
+    [SerializeField] private float baseReloadDuration = 5f;
 
     [SerializeField] private bool startLoaded = true;
 
@@ -73,6 +74,20 @@ public sealed class CannonSystemRuntime : MonoBehaviour
             !shipHullHealth.IsDestroyed
         );
 
+    public float CurrentReloadDuration
+    {
+        get
+        {
+            float multiplier =
+                loadedAmmo != null
+                    ? loadedAmmo.ReloadDurationMultiplier
+                    : 1f;
+
+            return Mathf.Max(0.01f, baseReloadDuration) *
+                   Mathf.Max(0.01f, multiplier);
+        }
+    }
+
     public float ReloadProgress01
     {
         get
@@ -89,7 +104,7 @@ public sealed class CannonSystemRuntime : MonoBehaviour
 
             return Mathf.Clamp01(
                 reloadProgress /
-                Mathf.Max(0.01f, reloadDuration)
+                CurrentReloadDuration
             );
         }
     }
@@ -106,7 +121,7 @@ public sealed class CannonSystemRuntime : MonoBehaviour
 
             return Mathf.Max(
                 0f,
-                reloadDuration - reloadProgress
+                CurrentReloadDuration - reloadProgress
             );
         }
     }
@@ -128,7 +143,7 @@ public sealed class CannonSystemRuntime : MonoBehaviour
 
         reloadProgress =
             isLoaded
-                ? reloadDuration
+                ? CurrentReloadDuration
                 : 0f;
     }
 
@@ -164,12 +179,12 @@ public sealed class CannonSystemRuntime : MonoBehaviour
 
         reloadProgress += Time.deltaTime;
 
-        if (reloadProgress < reloadDuration)
+        if (reloadProgress < CurrentReloadDuration)
         {
             return;
         }
 
-        reloadProgress = reloadDuration;
+        reloadProgress = CurrentReloadDuration;
         isLoaded = true;
 
         Debug.Log(
@@ -659,7 +674,7 @@ public sealed class CannonSystemRuntime : MonoBehaviour
 
     private void OnValidate()
     {
-        reloadDuration =
-            Mathf.Max(0.1f, reloadDuration);
+        baseReloadDuration =
+            Mathf.Max(0.01f, baseReloadDuration);
     }
 }

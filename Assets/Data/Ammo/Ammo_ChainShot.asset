@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9cf82ce54e2566f48961982ce0ee592a, type: 3}
-  m_Name: Ammo_Cannonball
-  m_EditorClassIdentifier: Assembly-CSharp::CannonballAmmoDefinition
-  displayName: "\u042F\u0434\u0440\u043E"
+  m_Script: {fileID: 11500000, guid: 84d02c9af0624cb88f083fbc9f403217, type: 3}
+  m_Name: Ammo_ChainShot
+  m_EditorClassIdentifier: Assembly-CSharp::ChainShotAmmoDefinition
+  displayName: "\u041A\u043D\u0438\u043F\u043F\u0435\u043B\u0438"
   icon: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   projectileSpeed: 6
   projectileLifetime: 5
@@ -22,7 +22,7 @@ MonoBehaviour:
   maxAmmoPerCannon: 10
   hullDamage: 10
   roomDamage: 20
-  sailsDamageMultiplier: 1
+  sailsDamageMultiplier: 3
   crewDamage: 25
   impactType: 0
   areaRadius: 0

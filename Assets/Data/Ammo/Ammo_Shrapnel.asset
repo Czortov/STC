@@ -9,22 +9,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9cf82ce54e2566f48961982ce0ee592a, type: 3}
-  m_Name: Ammo_Cannonball
-  m_EditorClassIdentifier: Assembly-CSharp::CannonballAmmoDefinition
-  displayName: "\u042F\u0434\u0440\u043E"
+  m_Script: {fileID: 11500000, guid: e188057aca9b4936826df15e12e5e02b, type: 3}
+  m_Name: Ammo_Shrapnel
+  m_EditorClassIdentifier: Assembly-CSharp::ShrapnelAmmoDefinition
+  displayName: "\u0428\u0440\u0430\u043F\u043D\u0435\u043B\u044C"
   icon: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   projectileSpeed: 6
   projectileLifetime: 5
   projectileSize: 0.18
-  projectileColor: {r: 0, g: 0, b: 0, a: 1}
-  reloadDurationMultiplier: 1
+  projectileColor: {r: 0.25, g: 0.2, b: 0.15, a: 1}
+  reloadDurationMultiplier: 1.2
   maxAmmoPerCannon: 10
-  hullDamage: 10
-  roomDamage: 20
+  hullDamage: 0
+  roomDamage: 0
   sailsDamageMultiplier: 1
-  crewDamage: 25
-  impactType: 0
-  areaRadius: 0
-  areaRoomDamage: 0
-  areaCrewDamage: 0
+  crewDamage: 0
+  impactType: 1
+  areaRadius: 2
+  areaRoomDamage: 10
+  areaCrewDamage: 20

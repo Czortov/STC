@@ -1927,7 +1927,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShipAmmoLoadout
   defaultAmmo: {fileID: 11400000, guid: 9180dda50d911e24da67ee425d3e3bf9, type: 2}
-  availableAmmo: []
+  availableAmmo:
+  - {fileID: 11400000, guid: 32a411954c2e49c68fe8ed672ee27b20, type: 2}
+  - {fileID: 11400000, guid: b1c47f79c3cc432cb268de5d8225054d, type: 2}
 --- !u!114 &1349167231
 MonoBehaviour:
   m_ObjectHideFlags: 0
