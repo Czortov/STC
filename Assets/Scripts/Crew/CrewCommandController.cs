@@ -1,9 +1,12 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public sealed class CrewCommandController : MonoBehaviour
 {
+    public event Action<CrewUnit> SelectionChanged;
+
     [Header("References")]
 
     [SerializeField] private Camera worldCamera;
@@ -154,7 +157,7 @@ public sealed class CrewCommandController : MonoBehaviour
         selectedUnit.AssignRoom(clickedRoom);
     }
 
-    private void SelectUnit(
+    public void SelectUnit(
         CrewUnit newSelectedUnit)
     {
         if (newSelectedUnit != null &&
@@ -185,6 +188,8 @@ public sealed class CrewCommandController : MonoBehaviour
                 selectedUnit
             );
         }
+
+        SelectionChanged?.Invoke(selectedUnit);
     }
 
     private Vector2 GetMouseWorldPosition()
@@ -229,7 +234,7 @@ public sealed class CrewCommandController : MonoBehaviour
         return null;
     }
 
-    private static bool IsPlayerCrew(
+    public static bool IsPlayerCrew(
         CrewUnit crew)
     {
         if (crew == null)

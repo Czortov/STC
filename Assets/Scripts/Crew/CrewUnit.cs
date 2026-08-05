@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,14 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public sealed class CrewUnit : MonoBehaviour
 {
+    private static readonly HashSet<CrewUnit> activeUnits = new HashSet<CrewUnit>();
+
+    public static event Action<CrewUnit> UnitRegistered;
+    public static event Action<CrewUnit> UnitUnregistered;
+    public static event Action<CrewUnit, bool> SelectionChanged;
+
+    public static IReadOnlyCollection<CrewUnit> ActiveUnits => activeUnits;
+
     [Header("Selection")]
 
     [SerializeField] private Color normalColor =
@@ -60,11 +69,36 @@ public sealed class CrewUnit : MonoBehaviour
 
     public bool IsSelected { get; private set; }
     public bool IsMoving => movementCoroutine != null;
+    public bool IsRepairing => wasRepairing;
 
     public ShipCellView CurrentCell { get; private set; }
     public ShipCellView TargetCell { get; private set; }
 
     public ShipRoomRuntime TargetRoom { get; private set; }
+
+    public bool IsPlayerOwned
+    {
+        get
+        {
+            ShipIdentity ship = GetComponentInParent<ShipIdentity>();
+
+            if (ship == null && CurrentCell != null && CurrentCell.Room != null)
+            {
+                ship = CurrentCell.Room.GetComponentInParent<ShipIdentity>();
+            }
+
+            return ship != null && ship.Team == ShipTeam.Player;
+        }
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetRegistry()
+    {
+        activeUnits.Clear();
+        UnitRegistered = null;
+        UnitUnregistered = null;
+        SelectionChanged = null;
+    }
 
     private void Awake()
     {
@@ -72,6 +106,22 @@ public sealed class CrewUnit : MonoBehaviour
         unitRenderer.sortingOrder = sortingOrder;
 
         ApplySelectionVisual();
+    }
+
+    private void OnEnable()
+    {
+        if (activeUnits.Add(this))
+        {
+            UnitRegistered?.Invoke(this);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (activeUnits.Remove(this))
+        {
+            UnitUnregistered?.Invoke(this);
+        }
     }
 
     private IEnumerator Start()
@@ -102,8 +152,14 @@ public sealed class CrewUnit : MonoBehaviour
 
     public void SetSelected(bool selected)
     {
+        if (IsSelected == selected)
+        {
+            return;
+        }
+
         IsSelected = selected;
         ApplySelectionVisual();
+        SelectionChanged?.Invoke(this, selected);
     }
 
     public void AssignRoom(ShipRoomRuntime room)

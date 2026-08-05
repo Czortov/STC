@@ -1,9 +1,13 @@
+using System;
 using UnityEngine;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(CrewUnit))]
 public sealed class CrewHealth : MonoBehaviour
 {
+    public event Action<CrewHealth> HealthChanged;
+    public event Action<CrewHealth> Died;
+
     [Header("Health")]
 
     [Min(1)]
@@ -81,6 +85,7 @@ public sealed class CrewHealth : MonoBehaviour
         );
 
         healthBarView?.Refresh();
+        HealthChanged?.Invoke(this);
 
         Debug.Log(
             $"{name} получил {damage} урона. " +
@@ -111,6 +116,7 @@ public sealed class CrewHealth : MonoBehaviour
 
         CurrentHealth = 0;
         healthBarView?.Refresh();
+        HealthChanged?.Invoke(this);
 
         Die();
     }
@@ -198,6 +204,7 @@ public sealed class CrewHealth : MonoBehaviour
         );
 
         healthBarView?.Refresh();
+        HealthChanged?.Invoke(this);
 
         if (writeLog)
         {
@@ -224,6 +231,7 @@ public sealed class CrewHealth : MonoBehaviour
 
         isDead = true;
         StopBunkHealing();
+        Died?.Invoke(this);
 
         Debug.Log(
             $"{name} погиб.",
