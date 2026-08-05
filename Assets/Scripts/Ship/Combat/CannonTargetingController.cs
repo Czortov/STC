@@ -18,6 +18,7 @@ public sealed class CannonTargetingController : MonoBehaviour
 
     [SerializeField] private Camera worldCamera;
     [SerializeField] private Camera enemyCamera;
+    [SerializeField] private BattleOverviewCameraController overviewCamera;
 
     [Tooltip("Ship Identity корабля игрока.")]
     [SerializeField] private ShipIdentity playerShip;
@@ -678,16 +679,36 @@ public sealed class CannonTargetingController : MonoBehaviour
         return null;
     }
 
-    private static bool IsPointerInLeftHalf()
+    private bool IsPointerInLeftHalf()
     {
-        return Mouse.current != null &&
-               Mouse.current.position.ReadValue().x < Screen.width * 0.5f;
+        if (Mouse.current == null)
+        {
+            return false;
+        }
+
+        Vector2 screenPosition = Mouse.current.position.ReadValue();
+
+        return screenPosition.x < Screen.width * 0.5f &&
+               !IsPointerInsideOverview(screenPosition);
     }
 
-    private static bool IsPointerInRightHalf()
+    private bool IsPointerInRightHalf()
     {
-        return Mouse.current != null &&
-               Mouse.current.position.ReadValue().x >= Screen.width * 0.5f;
+        if (Mouse.current == null)
+        {
+            return false;
+        }
+
+        Vector2 screenPosition = Mouse.current.position.ReadValue();
+
+        return screenPosition.x >= Screen.width * 0.5f &&
+               !IsPointerInsideOverview(screenPosition);
+    }
+
+    private bool IsPointerInsideOverview(Vector2 screenPosition)
+    {
+        return overviewCamera != null &&
+               overviewCamera.IsPointerInsideOverviewViewport(screenPosition);
     }
 
     private static Vector2 GetRoomWorldCenter(

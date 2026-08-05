@@ -2,6 +2,9 @@ using UnityEngine;
 
 public sealed class CannonProjectile : MonoBehaviour
 {
+    private const string OverviewHighlightLayerName = "OverviewHighlight";
+    private const float OverviewHighlightScale = 8f;
+
     private static Texture2D projectileTexture;
     private static Sprite projectileSprite;
 
@@ -66,6 +69,12 @@ public sealed class CannonProjectile : MonoBehaviour
             ammo.ProjectileColor;
 
         spriteRenderer.sortingOrder = 30;
+
+        CreateOverviewHighlight(
+            projectileObject.transform,
+            spriteRenderer.sprite,
+            ammo.ProjectileColor
+        );
 
         /*
          * Физические компоненты не создаём.
@@ -281,5 +290,42 @@ public sealed class CannonProjectile : MonoBehaviour
             HideFlags.HideAndDontSave;
 
         return projectileSprite;
+    }
+
+    private static void CreateOverviewHighlight(
+        Transform projectileTransform,
+        Sprite sprite,
+        Color projectileColor)
+    {
+        int highlightLayer =
+            LayerMask.NameToLayer(OverviewHighlightLayerName);
+
+        if (highlightLayer < 0)
+        {
+            Debug.LogWarning(
+                $"Layer {OverviewHighlightLayerName} is not configured."
+            );
+            return;
+        }
+
+        GameObject highlightObject =
+            new GameObject("OverviewHighlight");
+
+        highlightObject.layer = highlightLayer;
+        highlightObject.transform.SetParent(projectileTransform, false);
+        highlightObject.transform.localScale =
+            Vector3.one * OverviewHighlightScale;
+
+        SpriteRenderer highlightRenderer =
+            highlightObject.AddComponent<SpriteRenderer>();
+
+        highlightRenderer.sprite = sprite;
+        highlightRenderer.color = new Color(
+            Mathf.Max(0.85f, projectileColor.r),
+            Mathf.Max(0.65f, projectileColor.g),
+            0.15f,
+            0.78f
+        );
+        highlightRenderer.sortingOrder = 29;
     }
 }

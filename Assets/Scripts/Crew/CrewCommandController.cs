@@ -10,6 +10,7 @@ public sealed class CrewCommandController : MonoBehaviour
     [Header("References")]
 
     [SerializeField] private Camera worldCamera;
+    [SerializeField] private BattleOverviewCameraController overviewCamera;
 
     [Header("Selection")]
 
@@ -62,7 +63,9 @@ public sealed class CrewCommandController : MonoBehaviour
 
         Vector2 mousePosition = Mouse.current.position.ReadValue();
 
-        if (mousePosition.x >= Screen.width * 0.5f)
+        if (mousePosition.x >= Screen.width * 0.5f ||
+            overviewCamera != null &&
+            overviewCamera.IsPointerInsideOverviewViewport(mousePosition))
         {
             return;
         }

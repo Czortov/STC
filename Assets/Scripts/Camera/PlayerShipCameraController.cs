@@ -8,6 +8,7 @@ public sealed class PlayerShipCameraController : MonoBehaviour
     [Header("References")]
     [SerializeField] private Camera controlledCamera;
     [SerializeField] private Transform playerShipTarget;
+    [SerializeField] private BattleOverviewCameraController overviewCamera;
 
     [Header("Movement")]
     [SerializeField] private float panSpeed = 1f;
@@ -138,6 +139,12 @@ public sealed class PlayerShipCameraController : MonoBehaviour
 
     private bool IsPointerInInputArea(Vector2 mousePosition)
     {
+        if (overviewCamera != null &&
+            overviewCamera.IsPointerInsideOverviewViewport(mousePosition))
+        {
+            return false;
+        }
+
         return !restrictInputToLeftHalf ||
                mousePosition.x < Screen.width * 0.5f;
     }
