@@ -36,6 +36,7 @@ public sealed class CrewHealth : MonoBehaviour
 
     public int MaxHealth => maxHealth;
     public int CurrentHealth { get; private set; }
+    public bool IsInitialized { get; private set; }
 
     public bool IsDead => isDead;
 
@@ -60,6 +61,7 @@ public sealed class CrewHealth : MonoBehaviour
 
         maxHealth = Mathf.Max(1, maxHealth);
         CurrentHealth = maxHealth;
+        IsInitialized = true;
 
         if (createHealthBar)
         {

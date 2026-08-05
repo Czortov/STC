@@ -18,6 +18,7 @@ public sealed class CrewRosterEntry : MonoBehaviour
     private CrewHealth health;
     private CrewCommandController commandController;
     private string lastStatus;
+    private bool healthWasInitialized;
 
     public CrewUnit Unit => unit;
 
@@ -76,9 +77,9 @@ public sealed class CrewRosterEntry : MonoBehaviour
         healthFill.type = Image.Type.Filled;
         healthFill.fillMethod = Image.FillMethod.Horizontal;
 
-        healthText = CreateText("HealthText", transform, 12f, TextAlignmentOptions.Right);
-        SetRect(healthText.rectTransform, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f),
-            new Vector2(76f, 18f), new Vector2(-8f, 2f), new Vector2(1f, 0.5f));
+        healthText = CreateText("HealthText", transform, 11f, TextAlignmentOptions.Center);
+        SetRect(healthText.rectTransform, new Vector2(0f, 0.5f), new Vector2(1f, 0.5f),
+            new Vector2(-92f, 16f), new Vector2(78f, 2f), new Vector2(0f, 0.5f));
 
         statusText = CreateText("StatusText", transform, 13f, TextAlignmentOptions.Left);
         statusText.color = new Color(0.72f, 0.78f, 0.84f, 1f);
@@ -95,6 +96,7 @@ public sealed class CrewRosterEntry : MonoBehaviour
         unit = target;
         commandController = controller;
         health = unit != null ? unit.GetComponent<CrewHealth>() : null;
+        healthWasInitialized = health != null && health.IsInitialized;
 
         if (health != null)
         {
@@ -116,6 +118,12 @@ public sealed class CrewRosterEntry : MonoBehaviour
 
     private void Update()
     {
+        if (health != null && !healthWasInitialized && health.IsInitialized)
+        {
+            healthWasInitialized = true;
+            RefreshHealth();
+        }
+
         if (unit != null)
         {
             RefreshStatus(force: false);
@@ -156,7 +164,9 @@ public sealed class CrewRosterEntry : MonoBehaviour
 
     private void RefreshHealth()
     {
-        int current = health != null ? health.CurrentHealth : 0;
+        int current = health != null
+            ? health.IsInitialized ? health.CurrentHealth : health.MaxHealth
+            : 0;
         int maximum = health != null ? health.MaxHealth : 0;
         float ratio = maximum > 0 ? Mathf.Clamp01((float)current / maximum) : 0f;
 

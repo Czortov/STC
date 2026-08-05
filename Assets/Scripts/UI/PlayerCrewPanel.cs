@@ -5,12 +5,20 @@ using UnityEngine.UI;
 [DisallowMultipleComponent]
 public sealed class PlayerCrewPanel : MonoBehaviour
 {
+    private const int MaxVisibleEntries = 5;
+    private const float EntryHeight = 94f;
+    private const float EntrySpacing = 6f;
+    private const float VerticalPadding = 20f;
+
     [SerializeField] private CrewRosterEntry entryPrefab;
     [SerializeField] private Transform content;
     [SerializeField] private CrewCommandController commandController;
 
     private readonly Dictionary<CrewUnit, CrewRosterEntry> entries =
         new Dictionary<CrewUnit, CrewRosterEntry>();
+
+    private RectTransform panelRect;
+    private ScrollRect scrollRect;
 
     private void Awake()
     {
@@ -80,6 +88,7 @@ public sealed class PlayerCrewPanel : MonoBehaviour
         entry.name = $"CrewEntry_{unit.name}";
         entry.Initialize(unit, commandController);
         entries.Add(unit, entry);
+        RefreshPanelSize();
     }
 
     private void HandleUnitUnregistered(CrewUnit unit)
@@ -100,6 +109,8 @@ public sealed class PlayerCrewPanel : MonoBehaviour
         {
             Destroy(entry.gameObject);
         }
+
+        RefreshPanelSize();
     }
 
     private void EnsureView()
@@ -109,7 +120,7 @@ public sealed class PlayerCrewPanel : MonoBehaviour
             return;
         }
 
-        RectTransform panelRect = (RectTransform)transform;
+        panelRect = (RectTransform)transform;
         panelRect.anchorMin = new Vector2(0f, 1f);
         panelRect.anchorMax = new Vector2(0f, 1f);
         panelRect.pivot = new Vector2(0f, 1f);
@@ -123,7 +134,7 @@ public sealed class PlayerCrewPanel : MonoBehaviour
 
         Image scrollImage = CreateImage("ScrollView", transform, Color.clear);
         Stretch(scrollImage.rectTransform, 10f);
-        ScrollRect scrollRect = scrollImage.gameObject.AddComponent<ScrollRect>();
+        scrollRect = scrollImage.gameObject.AddComponent<ScrollRect>();
         scrollRect.horizontal = false;
         scrollRect.vertical = true;
         scrollRect.movementType = ScrollRect.MovementType.Clamped;
@@ -154,6 +165,31 @@ public sealed class PlayerCrewPanel : MonoBehaviour
         scrollRect.viewport = viewportImage.rectTransform;
         scrollRect.content = contentRect;
         content = contentRect;
+        RefreshPanelSize();
+    }
+
+    private void RefreshPanelSize()
+    {
+        if (panelRect == null)
+        {
+            panelRect = (RectTransform)transform;
+        }
+
+        int visibleCount = Mathf.Min(entries.Count, MaxVisibleEntries);
+        float entriesHeight = visibleCount > 0
+            ? visibleCount * EntryHeight + (visibleCount - 1) * EntrySpacing
+            : 0f;
+
+        panelRect.SetSizeWithCurrentAnchors(
+            RectTransform.Axis.Vertical,
+            entriesHeight + (visibleCount > 0 ? VerticalPadding : 0f)
+        );
+
+        if (scrollRect != null)
+        {
+            scrollRect.vertical = entries.Count > MaxVisibleEntries;
+            scrollRect.verticalNormalizedPosition = 1f;
+        }
     }
 
     private static RectTransform CreateRect(string objectName, Transform parent)
