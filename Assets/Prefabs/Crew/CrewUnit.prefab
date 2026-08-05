@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: -2340400194016839742}
   - component: {fileID: 6331415028915775338}
   - component: {fileID: 4130343994084608547}
+  - component: {fileID: 3927015843261987451}
   m_Layer: 0
   m_Name: CrewUnit
   m_TagString: Untagged
@@ -201,6 +202,78 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CrewAmmoCarrier
   carriedBoxVisual: {fileID: 790556421454739932}
+--- !u!114 &3927015843261987451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1928647872237851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c39c1ec3e2704bb4bb472f401e667d0b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::CrewAppearance
+  eyesRenderer: {fileID: 5365367678865383707}
+  mouthRenderer: {fileID: 4436474967941036910}
+  clothesRenderer: {fileID: 4896522468733511675}
+  hatRenderer: {fileID: 4628656901528478577}
+  eyes:
+  - {fileID: 21300000, guid: fea59b80d7ad05640bc59c8fffe30425, type: 3}
+  - {fileID: 21300000, guid: 56f21218b63117742a36b95a48f638dc, type: 3}
+  - {fileID: 21300000, guid: 38a733d2a31613f49b5052ee4d8a0bbe, type: 3}
+  - {fileID: 21300000, guid: f2490914e8f288946850e9d2c4468758, type: 3}
+  - {fileID: 21300000, guid: a4eac6f9553cf9b42ac988592bb360b1, type: 3}
+  - {fileID: 21300000, guid: 296b17d3fbe023948a7498a884350385, type: 3}
+  - {fileID: 21300000, guid: ed85cbcb995c15b46abff07770475e9f, type: 3}
+  - {fileID: 21300000, guid: 49113861c7364aa4abeacbf8e9e27ad2, type: 3}
+  - {fileID: 21300000, guid: 443c5ee28ad755c4089094a28f42ab6b, type: 3}
+  - {fileID: 21300000, guid: be180256a8d8b8545b8834aacb65e293, type: 3}
+  mouths:
+  - {fileID: 21300000, guid: 7b0d426aab9f6c94aa09e976ad5029f8, type: 3}
+  - {fileID: 21300000, guid: 2441c527390f74c4fafb6fb59d73caf8, type: 3}
+  - {fileID: 21300000, guid: df258fa8165153b428c44fc05d87652e, type: 3}
+  - {fileID: 21300000, guid: 1c24365cde1c501429db973740816992, type: 3}
+  - {fileID: 21300000, guid: 3ccfebb027dcad34abcbe8bcb93c2135, type: 3}
+  - {fileID: 21300000, guid: b9deeadac9e53d04eb2ecf2d22bd5787, type: 3}
+  - {fileID: 21300000, guid: d24843dcdddadb84a8a65c3f105c5057, type: 3}
+  - {fileID: 21300000, guid: ced25d3b1bde9884c8ad1f14cbf96695, type: 3}
+  - {fileID: 21300000, guid: c235cde07664a70419ee66a45ba3d6ce, type: 3}
+  - {fileID: 21300000, guid: 5930a49506cac684d93c88b43ba755b0, type: 3}
+  pirateClothes:
+  - {fileID: 21300000, guid: 2c2b611694c74a64d9c30d1f1577f646, type: 3}
+  - {fileID: 21300000, guid: dda8736b340a03d44af333983f056134, type: 3}
+  - {fileID: 21300000, guid: f4e52eeccfd43da49b2bffcd7e8dbb3f, type: 3}
+  - {fileID: 21300000, guid: 85c139463154e0447a0deca764808a4b, type: 3}
+  - {fileID: 21300000, guid: d6dc16db48fccaf49bf79411a55f47fa, type: 3}
+  - {fileID: 21300000, guid: 3c979f7e2ba9e7c4c940f13192a9b3db, type: 3}
+  - {fileID: 21300000, guid: df7da504ebe1d564dae629558796da8f, type: 3}
+  - {fileID: 21300000, guid: c58b6aca60ba7f242960b209539ea25d, type: 3}
+  - {fileID: 21300000, guid: f49bbc8560a012e40b8aa5ce76c0dfbd, type: 3}
+  - {fileID: 21300000, guid: 93c784d8ea1fbbe46bab8cd5ab81757d, type: 3}
+  pirateHats:
+  - {fileID: 21300000, guid: d0fba089e4a585c4b9791ca6de03c342, type: 3}
+  - {fileID: 21300000, guid: 598a6eeae7bd61d499c81291e2fcc79b, type: 3}
+  - {fileID: 21300000, guid: b509ac78652983f49934c3e03b581e19, type: 3}
+  - {fileID: 21300000, guid: b29ce57e6400e394d96affa8ce285663, type: 3}
+  - {fileID: 21300000, guid: 2c63f01c8e7eae245847b126adf00240, type: 3}
+  britishClothes:
+  - {fileID: 21300000, guid: e19fd5bda08d1ea40bbc82a59c657c40, type: 3}
+  - {fileID: 21300000, guid: 5db6dc6613296a74197bd509f38b1345, type: 3}
+  - {fileID: 21300000, guid: 43ea79349531a2e49a4d1e2d6835ae80, type: 3}
+  - {fileID: 21300000, guid: 46e918d6256a6064cb1a936574923a3c, type: 3}
+  - {fileID: 21300000, guid: 0e087dd585d1477449430b9fdab9fa16, type: 3}
+  - {fileID: 21300000, guid: 8fad8ef0b62f2e84585bcfc65cd72a16, type: 3}
+  - {fileID: 21300000, guid: 881eb22ba13be3645ad0f25f56da13b0, type: 3}
+  - {fileID: 21300000, guid: a527cfa6e6cb9954faf4aeb5c084809d, type: 3}
+  - {fileID: 21300000, guid: 70b24ab5bb2420b449207b72a9a9da6e, type: 3}
+  - {fileID: 21300000, guid: 8f6d1e01120c0e547adbe8e9ad1eb864, type: 3}
+  britishHats:
+  - {fileID: 21300000, guid: e544b5137f8e5ba4ea19eb0ed05a2a86, type: 3}
+  - {fileID: 21300000, guid: 2a125df7baab81d4fbc3f7fd391eec4a, type: 3}
+  - {fileID: 21300000, guid: f7722da639013024b8b79032e82981e6, type: 3}
+  - {fileID: 21300000, guid: 2a2d3619cf19f8648a4878778b9cc1c3, type: 3}
+  - {fileID: 21300000, guid: acbc44da05750294eaef028d1f5b2396, type: 3}
 --- !u!1 &48917312043473791
 GameObject:
   m_ObjectHideFlags: 0
