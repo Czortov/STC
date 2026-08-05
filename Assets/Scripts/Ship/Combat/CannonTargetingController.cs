@@ -17,6 +17,7 @@ public sealed class CannonTargetingController : MonoBehaviour
     [Header("References")]
 
     [SerializeField] private Camera worldCamera;
+    [SerializeField] private Camera enemyCamera;
 
     [Tooltip("Ship Identity корабля игрока.")]
     [SerializeField] private ShipIdentity playerShip;
@@ -34,6 +35,9 @@ public sealed class CannonTargetingController : MonoBehaviour
 
     [SerializeField] private Color enemyTargetColor =
         new Color(1f, 0.15f, 0.15f, 1f);
+
+    [SerializeField] private Color areaImpactPreviewColor =
+        new Color(1f, 0.45f, 0.08f, 0.85f);
 
     [Header("Outline Settings")]
 
@@ -70,6 +74,7 @@ public sealed class CannonTargetingController : MonoBehaviour
     private ShipRoomRuntime hoveredEnemyRoom;
 
     private RoomOutlineView hoveredTargetOutline;
+    private AreaImpactPreview areaImpactPreview;
 
     public CannonSystemRuntime SelectedCannon =>
         selectedCannon;
@@ -92,9 +97,12 @@ public sealed class CannonTargetingController : MonoBehaviour
 
     private void Awake()
     {
-        if (worldCamera == null)
+        if (enemyCamera == null)
         {
-            worldCamera = Camera.main;
+            Debug.LogError(
+                "CannonTargetingController: Enemy Camera is not assigned.",
+                this
+            );
         }
 
         hoveredTargetOutline =
@@ -102,6 +110,19 @@ public sealed class CannonTargetingController : MonoBehaviour
                 "HoveredEnemyRoomOutline",
                 103
             );
+
+        GameObject previewObject =
+            new GameObject("AreaImpactPreview");
+
+        previewObject.transform.SetParent(
+            transform,
+            false
+        );
+
+        areaImpactPreview =
+            previewObject.AddComponent<AreaImpactPreview>();
+
+        areaImpactPreview.Initialize(101);
 
         if (worldCamera == null)
         {
@@ -143,6 +164,7 @@ public sealed class CannonTargetingController : MonoBehaviour
 
         RefreshPlayerCannonOutlines();
         UpdateHoveredEnemyRoom();
+        RefreshAreaImpactPreview();
 
         if (Mouse.current == null ||
             IsPointerOverUI())
@@ -322,7 +344,8 @@ public sealed class CannonTargetingController : MonoBehaviour
     private void HandleCannonSelectionClick()
     {
         if (worldCamera == null ||
-            playerShip == null)
+            playerShip == null ||
+            !IsPointerInLeftHalf())
         {
             return;
         }
@@ -402,6 +425,11 @@ public sealed class CannonTargetingController : MonoBehaviour
 
     private void HandleFireClick()
     {
+        if (!IsPointerInRightHalf())
+        {
+            return;
+        }
+
         if (selectedCannon == null)
         {
             Debug.Log(
@@ -432,10 +460,11 @@ public sealed class CannonTargetingController : MonoBehaviour
 
     private void UpdateHoveredEnemyRoom()
     {
-        if (worldCamera == null ||
+        if (enemyCamera == null ||
             playerShip == null ||
             Mouse.current == null ||
-            IsPointerOverUI())
+            IsPointerOverUI() ||
+            !IsPointerInRightHalf())
         {
             SetHoveredEnemyRoom(null);
             return;
@@ -443,7 +472,7 @@ public sealed class CannonTargetingController : MonoBehaviour
 
         ShipRoomRuntime room =
             FindRoomAtPoint(
-                GetMouseWorldPosition()
+                GetMouseWorldPosition(enemyCamera)
             );
 
         if (!IsEnemyTarget(room))
@@ -508,6 +537,7 @@ public sealed class CannonTargetingController : MonoBehaviour
         if (hoveredEnemyRoom == null)
         {
             hoveredTargetOutline.Hide();
+            areaImpactPreview?.Hide();
             return;
         }
 
@@ -516,6 +546,36 @@ public sealed class CannonTargetingController : MonoBehaviour
             enemyTargetColor,
             targetOutlineWidth,
             outlinePadding
+        );
+
+        RefreshAreaImpactPreview();
+    }
+
+    private void RefreshAreaImpactPreview()
+    {
+        if (areaImpactPreview == null ||
+            hoveredEnemyRoom == null ||
+            selectedCannon == null)
+        {
+            areaImpactPreview?.Hide();
+            return;
+        }
+
+        CannonAmmoDefinition ammo =
+            selectedCannon.LoadedAmmo;
+
+        if (!(ammo is ShrapnelAmmoDefinition) ||
+            ammo.ImpactType != AmmoImpactType.Area ||
+            ammo.AreaRadius <= 0f)
+        {
+            areaImpactPreview.Hide();
+            return;
+        }
+
+        areaImpactPreview.Show(
+            GetRoomWorldCenter(hoveredEnemyRoom),
+            ammo.AreaRadius,
+            areaImpactPreviewColor
         );
     }
 
@@ -529,6 +589,8 @@ public sealed class CannonTargetingController : MonoBehaviour
         {
             hoveredTargetOutline.Hide();
         }
+
+        areaImpactPreview?.Hide();
 
         foreach (
             RoomOutlineView outline
@@ -569,11 +631,16 @@ public sealed class CannonTargetingController : MonoBehaviour
 
     private Vector2 GetMouseWorldPosition()
     {
+        return GetMouseWorldPosition(worldCamera);
+    }
+
+    private static Vector2 GetMouseWorldPosition(Camera camera)
+    {
         Vector2 screenPosition =
             Mouse.current.position.ReadValue();
 
         Vector3 worldPosition =
-            worldCamera.ScreenToWorldPoint(
+            camera.ScreenToWorldPoint(
                 screenPosition
             );
 
@@ -609,6 +676,34 @@ public sealed class CannonTargetingController : MonoBehaviour
         }
 
         return null;
+    }
+
+    private static bool IsPointerInLeftHalf()
+    {
+        return Mouse.current != null &&
+               Mouse.current.position.ReadValue().x < Screen.width * 0.5f;
+    }
+
+    private static bool IsPointerInRightHalf()
+    {
+        return Mouse.current != null &&
+               Mouse.current.position.ReadValue().x >= Screen.width * 0.5f;
+    }
+
+    private static Vector2 GetRoomWorldCenter(
+        ShipRoomRuntime room)
+    {
+        if (room == null)
+        {
+            return Vector2.zero;
+        }
+
+        Collider2D roomCollider =
+            room.GetComponent<Collider2D>();
+
+        return roomCollider != null && roomCollider.enabled
+            ? roomCollider.bounds.center
+            : room.transform.position;
     }
 
     private static bool IsPointerOverUI()

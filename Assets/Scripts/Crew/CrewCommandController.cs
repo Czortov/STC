@@ -23,14 +23,8 @@ public sealed class CrewCommandController : MonoBehaviour
     {
         if (worldCamera == null)
         {
-            worldCamera = Camera.main;
-        }
-
-        if (worldCamera == null)
-        {
             Debug.LogError(
-                "CrewCommandController: не найдена игровая камера. " +
-                "Назначь её в Inspector или установи тег MainCamera.",
+                "CrewCommandController: Player Camera is not assigned.",
                 this
             );
         }
@@ -62,6 +56,13 @@ public sealed class CrewCommandController : MonoBehaviour
         }
 
         if (IsPointerOverUI())
+        {
+            return;
+        }
+
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+
+        if (mousePosition.x >= Screen.width * 0.5f)
         {
             return;
         }

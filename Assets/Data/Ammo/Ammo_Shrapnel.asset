@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShrapnelAmmoDefinition
   displayName: "\u0428\u0440\u0430\u043F\u043D\u0435\u043B\u044C"
   icon: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  projectileSpeed: 6
+  projectileSpeed: 18
   projectileLifetime: 5
   projectileSize: 0.18
   projectileColor: {r: 0.25, g: 0.2, b: 0.15, a: 1}
@@ -26,5 +26,5 @@ MonoBehaviour:
   crewDamage: 0
   impactType: 1
   areaRadius: 2
-  areaRoomDamage: 10
-  areaCrewDamage: 20
+  areaRoomDamage: 5
+  areaCrewDamage: 25

@@ -91,8 +91,18 @@ public sealed class CannonProjectile : MonoBehaviour
         targetRoom = newTargetRoom;
         ammo = newAmmo;
 
-        remainingLifetime =
-            ammo.ProjectileLifetime;
+        float distanceToTarget = Vector3.Distance(
+            transform.position,
+            GetRoomWorldCenter(targetRoom)
+        );
+
+        float travelTime =
+            distanceToTarget / ammo.ProjectileSpeed;
+
+        remainingLifetime = Mathf.Max(
+            ammo.ProjectileLifetime,
+            travelTime + 1f
+        );
 
         impactDistance =
             Mathf.Max(
