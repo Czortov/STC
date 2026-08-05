@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -5,6 +6,8 @@ using UnityEngine.InputSystem;
 
 public sealed class CannonTargetingController : MonoBehaviour
 {
+    public event Action<CannonSystemRuntime> SelectedCannonChanged;
+
     public static bool IsTargetingMode
     {
         get;
@@ -73,6 +76,19 @@ public sealed class CannonTargetingController : MonoBehaviour
 
     public ShipRoomRuntime HoveredEnemyRoom =>
         hoveredEnemyRoom;
+
+    public ShipIdentity PlayerShip => playerShip;
+
+    public bool TrySelectCannon(CannonSystemRuntime cannon)
+    {
+        if (!IsPlayerCannon(cannon))
+        {
+            return false;
+        }
+
+        SetSelectedCannon(cannon);
+        return true;
+    }
 
     private void Awake()
     {
@@ -463,9 +479,15 @@ public sealed class CannonTargetingController : MonoBehaviour
     private void SetSelectedCannon(
         CannonSystemRuntime cannon)
     {
+        if (selectedCannon == cannon)
+        {
+            return;
+        }
+
         selectedCannon = cannon;
 
         RefreshPlayerCannonOutlines();
+        SelectedCannonChanged?.Invoke(selectedCannon);
     }
 
     private void SetHoveredEnemyRoom(
@@ -499,6 +521,7 @@ public sealed class CannonTargetingController : MonoBehaviour
 
     private void ClearTargetingState()
     {
+        bool hadSelection = selectedCannon != null;
         selectedCannon = null;
         hoveredEnemyRoom = null;
 
@@ -515,6 +538,11 @@ public sealed class CannonTargetingController : MonoBehaviour
             {
                 outline.Hide();
             }
+        }
+
+        if (hadSelection)
+        {
+            SelectedCannonChanged?.Invoke(null);
         }
     }
 

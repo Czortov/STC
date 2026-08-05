@@ -2254,6 +2254,7 @@ RectTransform:
   - {fileID: 2131569222}
   - {fileID: 1625918187}
   - {fileID: 2140000001}
+  - {fileID: 2150000001}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3004,6 +3005,66 @@ MonoBehaviour:
   entryPrefab: {fileID: 11400000, guid: 7ba616bf6bc740a9bed6d91e62b0f9ad, type: 3}
   content: {fileID: 0}
   commandController: {fileID: 1315806146}
+--- !u!1 &2150000000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2150000001}
+  - component: {fileID: 2150000002}
+  m_Layer: 5
+  m_Name: PlayerCannonPanel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2150000001
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2150000000}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1426124651}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 16, y: 16}
+  m_SizeDelta: {x: 680, y: 120}
+  m_Pivot: {x: 0, y: 0}
+--- !u!114 &2150000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2150000000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73cc477c4d93499f996981bc99c51595, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCannonPanel
+  targetingController: {fileID: 1489803872}
+  cannonCardPrefab: {fileID: 11400000, guid: a25d0e50a8414a8a8598fa3675206c40, type: 3}
+  scrollRect: {fileID: 0}
+  viewport: {fileID: 0}
+  content: {fileID: 0}
+  grid: {fileID: 0}
+  normalCellSize: {x: 160, y: 100}
+  compactCellSize: {x: 80, y: 50}
+  normalSpacing: {x: 8, y: 8}
+  compactSpacing: {x: 6, y: 6}
+  screenMargin: {x: 16, y: 16}
+  panelPadding: 10
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

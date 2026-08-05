@@ -1,9 +1,15 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(ShipRoomRuntime))]
 public sealed class CannonSystemRuntime : MonoBehaviour
 {
+    public static event Action<CannonSystemRuntime> CannonRegistered;
+    public static event Action<CannonSystemRuntime> CannonUnregistered;
+
+    public event Action<CannonSystemRuntime> StateChanged;
+
     private static readonly List<CannonSystemRuntime> allCannons =
         new List<CannonSystemRuntime>();
 
@@ -152,12 +158,16 @@ public sealed class CannonSystemRuntime : MonoBehaviour
         if (!allCannons.Contains(this))
         {
             allCannons.Add(this);
+            CannonRegistered?.Invoke(this);
         }
     }
 
     private void OnDisable()
     {
-        allCannons.Remove(this);
+        if (allCannons.Remove(this))
+        {
+            CannonUnregistered?.Invoke(this);
+        }
     }
 
     private void Update()
@@ -186,6 +196,7 @@ public sealed class CannonSystemRuntime : MonoBehaviour
 
         reloadProgress = CurrentReloadDuration;
         isLoaded = true;
+        StateChanged?.Invoke(this);
 
         Debug.Log(
             $"Пушка в отсеке {room.Id} зарядила " +
@@ -346,6 +357,7 @@ public sealed class CannonSystemRuntime : MonoBehaviour
 
         isLoaded = false;
         reloadProgress = 0f;
+        StateChanged?.Invoke(this);
 
         Debug.Log(
             $"Пушка в отсеке {room.Id} выстрелила " +
@@ -402,6 +414,7 @@ public sealed class CannonSystemRuntime : MonoBehaviour
         // пушку необходимо зарядить заново.
         isLoaded = false;
         reloadProgress = 0f;
+        StateChanged?.Invoke(this);
 
         Debug.Log(
             $"Пушка в отсеке {room?.Id} выбрала " +
@@ -522,6 +535,8 @@ public sealed class CannonSystemRuntime : MonoBehaviour
 
             return false;
         }
+
+        StateChanged?.Invoke(this);
 
         Debug.Log(
             $"Пушка в отсеке {room?.Id} полностью пополнена.",
