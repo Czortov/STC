@@ -13,6 +13,9 @@ public sealed class CannonProjectile : MonoBehaviour
 
     private float remainingLifetime;
     private float impactDistance;
+    private float flightDuration;
+    private float elapsedFlightTime;
+    private Vector3 startPosition;
 
     private bool initialized;
     private bool hasImpacted;
@@ -108,6 +111,10 @@ public sealed class CannonProjectile : MonoBehaviour
         float travelTime =
             distanceToTarget / ammo.ProjectileSpeed;
 
+        startPosition = transform.position;
+        flightDuration = Mathf.Max(0.01f, travelTime);
+        elapsedFlightTime = 0f;
+
         remainingLifetime = Mathf.Max(
             ammo.ProjectileLifetime,
             travelTime + 1f
@@ -141,20 +148,29 @@ public sealed class CannonProjectile : MonoBehaviour
         targetPosition.z =
             transform.position.z;
 
-        transform.position =
-            Vector3.MoveTowards(
-                transform.position,
-                targetPosition,
-                ammo.ProjectileSpeed *
-                Time.deltaTime
-            );
+        elapsedFlightTime += Time.deltaTime;
+
+        float flightProgress = Mathf.Clamp01(
+            elapsedFlightTime / flightDuration
+        );
+
+        float arcOffset =
+            4f * ammo.ProjectileArcHeight *
+            flightProgress * (1f - flightProgress);
+
+        transform.position = Vector3.Lerp(
+            startPosition,
+            targetPosition,
+            flightProgress
+        );
+        transform.position += Vector3.up * arcOffset;
 
         float distanceSquared =
             (transform.position - targetPosition)
             .sqrMagnitude;
 
-        if (distanceSquared <=
-            impactDistance * impactDistance)
+        if (flightProgress >= 1f ||
+            distanceSquared <= impactDistance * impactDistance)
         {
             Impact();
             return;

@@ -30,6 +30,10 @@ public abstract class CannonAmmoDefinition : ScriptableObject
     [Min(0.02f)]
     [SerializeField] private float projectileSize = 0.18f;
 
+    [Tooltip("Высота параболической дуги полёта в мировых единицах.")]
+    [Min(0f)]
+    [SerializeField] private float projectileArcHeight = 8f;
+
     [Tooltip("Цвет снаряда.")]
     [SerializeField] private Color projectileColor = Color.black;
 
@@ -81,6 +85,7 @@ public abstract class CannonAmmoDefinition : ScriptableObject
     public float ProjectileSpeed => Mathf.Max(0.1f, projectileSpeed);
     public float ProjectileLifetime => Mathf.Max(0.1f, projectileLifetime);
     public float ProjectileSize => Mathf.Max(0.02f, projectileSize);
+    public float ProjectileArcHeight => Mathf.Max(0f, projectileArcHeight);
     public Color ProjectileColor => projectileColor;
     public float ReloadDurationMultiplier =>
         Mathf.Max(0.01f, reloadDurationMultiplier);
@@ -313,6 +318,7 @@ public abstract class CannonAmmoDefinition : ScriptableObject
         projectileSpeed = Mathf.Max(0.1f, projectileSpeed);
         projectileLifetime = Mathf.Max(0.1f, projectileLifetime);
         projectileSize = Mathf.Max(0.02f, projectileSize);
+        projectileArcHeight = Mathf.Max(0f, projectileArcHeight);
         reloadDurationMultiplier =
             Mathf.Max(0.01f, reloadDurationMultiplier);
         maxAmmoPerCannon = Mathf.Max(1, maxAmmoPerCannon);

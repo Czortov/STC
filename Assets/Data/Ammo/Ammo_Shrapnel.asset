@@ -17,9 +17,10 @@ MonoBehaviour:
   projectileSpeed: 18
   projectileLifetime: 5
   projectileSize: 0.18
+  projectileArcHeight: 8
   projectileColor: {r: 0.25, g: 0.2, b: 0.15, a: 1}
   reloadDurationMultiplier: 1.2
-  maxAmmoPerCannon: 10
+  maxAmmoPerCannon: 3
   hullDamage: 0
   roomDamage: 0
   sailsDamageMultiplier: 1
