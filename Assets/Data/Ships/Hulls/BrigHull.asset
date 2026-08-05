@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e6037d16d3b64d4a9d4f345c91fc8bc, type: 3}
+  m_Name: BrigHull
+  m_EditorClassIdentifier: Assembly-CSharp::ShipHullDefinition
+  hullName: Brig
+  hullMatrix: '120000000
+
+    121111211
+
+    111111210
+
+    001111200'
+  availableLayouts:
+  - {fileID: 11400000, guid: b090795e5679dbe48be45667c52f0308, type: 2}
+  - {fileID: 11400000, guid: f1d5193012084ff479026946fa3a2d9e, type: 2}
+  - {fileID: 11400000, guid: 0a3c0597e6f3aed429890cc0a0276a9d, type: 2}
