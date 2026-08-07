@@ -17,6 +17,11 @@ public sealed class ShipModuleVisualEntry
     );
     public Vector2 OffsetInCells => offsetInCells;
     public int SortingOrder => sortingOrder;
+    public bool UsesNativeCellTransform =>
+        Mathf.Approximately(sizeInCells.x, 1f) &&
+        Mathf.Approximately(sizeInCells.y, 1f) &&
+        Mathf.Approximately(offsetInCells.x, 0f) &&
+        Mathf.Approximately(offsetInCells.y, 0f);
 
     public bool TryGetSprite(
         System.Random random,
@@ -92,16 +97,14 @@ public sealed class ShipHullDefinition : ScriptableObject
     [SerializeField] private Sprite[] exteriorWallSprites;
     [SerializeField] private ShipModuleVisualEntry[] moduleVisuals;
     [SerializeField] private Sprite ladderSprite;
-    [SerializeField] private Vector2 ladderSizeInCells = Vector2.one;
-    [SerializeField] private Vector2 ladderOffsetInCells;
     [SerializeField] private int ladderSortingOrder = -5;
 
     [Tooltip(
-        "X is the guaranteed hull padding on the left and right. " +
-        "Y is the guaranteed bottom padding. The top extent follows " +
-        "the hull sprite aspect ratio.")]
-    [SerializeField] private Vector2Int hullPaddingInCells =
-        new Vector2Int(1, 1);
+        "Guaranteed distance between the hull bottom and the lowest " +
+        "matrix row. Hull extends one cell beyond each horizontal " +
+        "side of the matrix.")]
+    [Min(0)]
+    [SerializeField] private int hullBottomPaddingInCells = 1;
 
     [SerializeField] private int hullSortingOrder = -20;
     [SerializeField] private int wallSortingOrder = -10;
@@ -128,13 +131,8 @@ public sealed class ShipHullDefinition : ScriptableObject
     public IReadOnlyList<ShipModuleVisualEntry> ModuleVisuals =>
         moduleVisuals;
     public Sprite LadderSprite => ladderSprite;
-    public Vector2 LadderSizeInCells => new Vector2(
-        Mathf.Max(0.01f, ladderSizeInCells.x),
-        Mathf.Max(0.01f, ladderSizeInCells.y)
-    );
-    public Vector2 LadderOffsetInCells => ladderOffsetInCells;
     public int LadderSortingOrder => ladderSortingOrder;
-    public Vector2Int HullPaddingInCells => hullPaddingInCells;
+    public int HullBottomPaddingInCells => hullBottomPaddingInCells;
     public int HullSortingOrder => hullSortingOrder;
     public int WallSortingOrder => wallSortingOrder;
     public int VisualSeed => visualSeed;

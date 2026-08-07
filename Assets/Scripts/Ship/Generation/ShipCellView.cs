@@ -67,8 +67,6 @@ public sealed class ShipCellView : MonoBehaviour
         ShipModuleVisualEntry moduleVisual,
         Sprite moduleSprite,
         Sprite ladderSprite,
-        Vector2 ladderSizeInCells,
-        Vector2 ladderOffsetInCells,
         int ladderSortingOrder,
         float cellSize,
         Color roomColor,
@@ -115,12 +113,11 @@ public sealed class ShipCellView : MonoBehaviour
 
         if (wallSprite != null)
         {
-            CreatePart(
+            CreateNativeSpritePart(
                 "BackgroundSprite",
                 wallSprite,
                 Color.white,
                 Vector2.zero,
-                new Vector2(cellSize, cellSize),
                 wallSortingOrder
             );
         }
@@ -140,12 +137,11 @@ public sealed class ShipCellView : MonoBehaviour
         {
             if (ladderSprite != null)
             {
-                CreatePart(
+                CreateNativeSpritePart(
                     "LadderSprite",
                     ladderSprite,
                     Color.white,
-                    ladderOffsetInCells * cellSize,
-                    ladderSizeInCells * cellSize,
+                    Vector2.zero,
                     ladderSortingOrder
                 );
             }
@@ -163,14 +159,27 @@ public sealed class ShipCellView : MonoBehaviour
                  moduleVisual != null &&
                  moduleSprite != null)
         {
-            CreatePart(
-                "ModuleSprite",
-                moduleSprite,
-                Color.white,
-                moduleVisual.OffsetInCells * cellSize,
-                moduleVisual.SizeInCells * cellSize,
-                moduleVisual.SortingOrder
-            );
+            if (moduleVisual.UsesNativeCellTransform)
+            {
+                CreateNativeSpritePart(
+                    "ModuleSprite",
+                    moduleSprite,
+                    Color.white,
+                    Vector2.zero,
+                    moduleVisual.SortingOrder
+                );
+            }
+            else
+            {
+                CreatePart(
+                    "ModuleSprite",
+                    moduleSprite,
+                    Color.white,
+                    moduleVisual.OffsetInCells * cellSize,
+                    moduleVisual.SizeInCells * cellSize,
+                    moduleVisual.SortingOrder
+                );
+            }
         }
         else if (ModuleType != ShipModuleType.None)
         {
@@ -350,6 +359,31 @@ public sealed class ShipCellView : MonoBehaviour
             spriteSize.y > 0f ? size.y / spriteSize.y : 1f,
             1f
         );
+
+        SpriteRenderer spriteRenderer =
+            part.AddComponent<SpriteRenderer>();
+
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.color = color;
+        spriteRenderer.sortingOrder = sortingOrder;
+    }
+
+    private void CreateNativeSpritePart(
+        string objectName,
+        Sprite sprite,
+        Color color,
+        Vector2 localPosition,
+        int sortingOrder)
+    {
+        GameObject part = new GameObject(objectName);
+
+        part.transform.SetParent(transform, false);
+        part.transform.localPosition = new Vector3(
+            localPosition.x,
+            localPosition.y,
+            0f
+        );
+        part.transform.localScale = Vector3.one;
 
         SpriteRenderer spriteRenderer =
             part.AddComponent<SpriteRenderer>();

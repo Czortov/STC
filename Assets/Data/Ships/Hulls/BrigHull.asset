@@ -65,10 +65,8 @@ MonoBehaviour:
     offsetInCells: {x: 0, y: 0}
     sortingOrder: -5
   ladderSprite: {fileID: 21300000, guid: 72ee33345d7452e4bbdff5283f77aebb, type: 3}
-  ladderSizeInCells: {x: 1, y: 1}
-  ladderOffsetInCells: {x: 0, y: 0}
   ladderSortingOrder: -5
-  hullPaddingInCells: {x: 1, y: 1}
+  hullBottomPaddingInCells: 1
   hullSortingOrder: -20
   wallSortingOrder: -10
   visualSeed: 12345

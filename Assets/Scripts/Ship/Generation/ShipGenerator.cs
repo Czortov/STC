@@ -4,6 +4,7 @@ using UnityEngine;
 public sealed class ShipGenerator : MonoBehaviour
 {
     private const string GeneratedRootName = "GeneratedShip";
+    private const float HullPixelsPerCell = 256f;
 
     [Header("Blueprint Source")]
 
@@ -307,31 +308,32 @@ public sealed class ShipGenerator : MonoBehaviour
         renderer.color = Color.white;
         renderer.sortingOrder = hull.HullSortingOrder;
 
-        Vector2Int padding = hull.HullPaddingInCells;
-        Vector2 spriteSize = hull.HullSprite.bounds.size;
-        float desiredWidth =
-            (shipData.Width + Mathf.Max(0, padding.x) * 2) *
-            cellSize;
+        Sprite hullSprite = hull.HullSprite;
+        float pixelsToWorld = cellSize / HullPixelsPerCell;
+        float uniformScale =
+            pixelsToWorld * hullSprite.pixelsPerUnit;
 
-        float uniformScale = spriteSize.x > 0f
-            ? desiredWidth / spriteSize.x
-            : 1f;
-
-        float scaledHeight = spriteSize.y * uniformScale;
         Vector3 matrixCenter = GetMatrixCenterLocalPosition(
             shipData.Width,
             shipData.Height
         );
 
+        float matrixLeft =
+            matrixCenter.x - shipData.Width * cellSize * 0.5f;
         float matrixBottom =
             matrixCenter.y - shipData.Height * cellSize * 0.5f;
 
+        float hullLeft = matrixLeft - cellSize;
         float hullBottom =
-            matrixBottom - Mathf.Max(0, padding.y) * cellSize;
+            matrixBottom -
+            Mathf.Max(0, hull.HullBottomPaddingInCells) * cellSize;
 
+        // The PNG is authored on a 256 px grid. Position its full rect by
+        // the actual sprite pivot, without relying on bounds or assuming a
+        // centered pivot. The PNG height is intentionally unrestricted.
         hullObject.transform.localPosition = new Vector3(
-            matrixCenter.x,
-            hullBottom + scaledHeight * 0.5f,
+            hullLeft + hullSprite.pivot.x * pixelsToWorld,
+            hullBottom + hullSprite.pivot.y * pixelsToWorld,
             0f
         );
 
@@ -340,6 +342,24 @@ public sealed class ShipGenerator : MonoBehaviour
             uniformScale,
             1f
         );
+
+        float expectedWidthInPixels =
+            (shipData.Width + 2) * HullPixelsPerCell;
+
+        if (!Mathf.Approximately(
+                hullSprite.rect.width,
+                expectedWidthInPixels))
+        {
+            Debug.LogWarning(
+                $"ShipGenerator: hull sprite '{hullSprite.name}' is " +
+                $"{hullSprite.rect.width}px wide, but a " +
+                $"{shipData.Width}-cell matrix requires " +
+                $"{expectedWidthInPixels}px (matrix width plus one " +
+                "cell on each side). The PNG is displayed at its " +
+                "authored 256 px per cell scale.",
+                hull
+            );
+        }
     }
 
     private Vector3 GetMatrixCenterLocalPosition(int width, int height)
@@ -569,8 +589,6 @@ public sealed class ShipGenerator : MonoBehaviour
                     moduleVisual,
                     moduleSprite,
                     hull.LadderSprite,
-                    hull.LadderSizeInCells,
-                    hull.LadderOffsetInCells,
                     hull.LadderSortingOrder,
                     cellSize,
                     GetRoomColor(cellBlueprint.RoomId),
