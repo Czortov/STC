@@ -14,6 +14,10 @@ public sealed class PlayerCrewPanel : MonoBehaviour
     [SerializeField] private Transform content;
     [SerializeField] private CrewCommandController commandController;
 
+    [Header("Runtime UI Theme")]
+    [SerializeField] private Sprite panelSprite;
+    [SerializeField] private Sprite buttonSprite;
+
     private readonly Dictionary<CrewUnit, CrewRosterEntry> entries =
         new Dictionary<CrewUnit, CrewRosterEntry>();
 
@@ -86,6 +90,7 @@ public sealed class PlayerCrewPanel : MonoBehaviour
 
         CrewRosterEntry entry = Instantiate(entryPrefab, content);
         entry.name = $"CrewEntry_{unit.name}";
+        entry.ApplyButtonSprite(buttonSprite);
         entry.Initialize(unit, commandController);
         entries.Add(unit, entry);
         RefreshPanelSize();
@@ -129,6 +134,7 @@ public sealed class PlayerCrewPanel : MonoBehaviour
 
         Image background = CreateImage("Background", transform,
             new Color(0.025f, 0.035f, 0.055f, 0.88f));
+        RuntimeUiVisuals.ApplySlicedSprite(background, panelSprite);
         Stretch(background.rectTransform, 0f);
         background.raycastTarget = false;
 
@@ -215,4 +221,5 @@ public sealed class PlayerCrewPanel : MonoBehaviour
         rect.offsetMin = new Vector2(inset, inset);
         rect.offsetMax = new Vector2(-inset, -inset);
     }
+
 }

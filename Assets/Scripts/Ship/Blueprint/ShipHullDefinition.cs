@@ -8,7 +8,10 @@ public sealed class ShipModuleVisualEntry
     [SerializeField] private Sprite[] sprites;
     [SerializeField] private Vector2 sizeInCells = Vector2.one;
     [SerializeField] private Vector2 offsetInCells;
-    [SerializeField] private int sortingOrder = -5;
+    [Tooltip(
+        "Use an order above 40 to render the module in front of crew. " +
+        "Bunks are the exception and should remain behind crew.")]
+    [SerializeField] private int sortingOrder = 50;
 
     public ShipModuleType ModuleType => moduleType;
     public Vector2 SizeInCells => new Vector2(

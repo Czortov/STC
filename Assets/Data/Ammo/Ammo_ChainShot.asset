@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Ammo_ChainShot
   m_EditorClassIdentifier: Assembly-CSharp::ChainShotAmmoDefinition
   displayName: "\u041A\u043D\u0438\u043F\u043F\u0435\u043B\u0438"
-  icon: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  icon: {fileID: 21300000, guid: 18fa26363fe25864982c10b75e5b97ee, type: 3}
   projectileSpeed: 6
   projectileLifetime: 5
   projectileSize: 0.18

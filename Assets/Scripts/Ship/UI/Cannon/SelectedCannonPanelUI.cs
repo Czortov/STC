@@ -25,6 +25,9 @@ public sealed class SelectedCannonPanelUI : MonoBehaviour
     [Tooltip("Неактивный шаблон одной кнопки боеприпаса.")]
     [SerializeField] private CannonAmmoButtonUI ammoButtonTemplate;
 
+    [Header("Runtime UI Theme")]
+    [SerializeField] private Sprite buttonSprite;
+
     private readonly List<CannonAmmoButtonUI> ammoButtons =
         new List<CannonAmmoButtonUI>();
 
@@ -117,6 +120,7 @@ public sealed class SelectedCannonPanelUI : MonoBehaviour
             CannonAmmoButtonUI button =
                 Instantiate(ammoButtonTemplate, ammoButtonsContainer);
 
+            button.ApplyButtonSprite(buttonSprite);
             button.gameObject.SetActive(true);
             button.Bind(currentCannon, ammo);
 

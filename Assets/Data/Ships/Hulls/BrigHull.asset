@@ -39,25 +39,25 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 4660244ab74722d4d81cc4fe5750d38f, type: 3}
     sizeInCells: {x: 1, y: 1}
     offsetInCells: {x: 0, y: 0}
-    sortingOrder: -5
+    sortingOrder: 50
   - moduleType: 2
     sprites:
     - {fileID: 21300000, guid: 6c04fae2ed2cc4043b8a16fa23a64b7f, type: 3}
     sizeInCells: {x: 1, y: 1}
     offsetInCells: {x: 0, y: 0}
-    sortingOrder: -5
+    sortingOrder: 50
   - moduleType: 3
     sprites:
     - {fileID: 21300000, guid: e3fbdb56221d431448b9e2c2e17e2e92, type: 3}
     sizeInCells: {x: 1, y: 1}
     offsetInCells: {x: 0, y: 0}
-    sortingOrder: -5
+    sortingOrder: 50
   - moduleType: 5
     sprites:
     - {fileID: 21300000, guid: 1b55b5aeef343f543ab882883dc69586, type: 3}
     sizeInCells: {x: 1, y: 1}
     offsetInCells: {x: 0, y: 0}
-    sortingOrder: -5
+    sortingOrder: 50
   - moduleType: 6
     sprites:
     - {fileID: 21300000, guid: 35c206c8b9f71984fb9b330ba80e2dbe, type: 3}

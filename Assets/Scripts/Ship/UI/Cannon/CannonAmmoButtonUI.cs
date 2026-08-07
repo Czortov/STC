@@ -6,27 +6,48 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Button))]
 public sealed class CannonAmmoButtonUI : MonoBehaviour
 {
+    private static readonly Color SelectedTextColor =
+        new Color(1f, 0.78f, 0.25f, 1f);
+
+    private static readonly Color UnavailableTextColor =
+        new Color(0.55f, 0.55f, 0.55f, 1f);
+
     [Header("References")]
     [SerializeField] private Image background;
     [SerializeField] private Image ammoIcon;
     [SerializeField] private TMP_Text ammoNameText;
     [SerializeField] private TMP_Text ammoCountText;
 
-    [Header("Colors")]
-    [SerializeField] private Color normalColor =
-        new Color(0.22f, 0.22f, 0.22f, 1f);
-
-    [SerializeField] private Color selectedColor =
-        new Color(0.85f, 0.62f, 0.18f, 1f);
-
-    [SerializeField] private Color unavailableColor =
-        new Color(0.16f, 0.16f, 0.16f, 0.65f);
-
     private Button button;
     private CannonSystemRuntime cannon;
     private CannonAmmoDefinition ammo;
 
     public CannonAmmoDefinition Ammo => ammo;
+
+    internal void ApplyButtonSprite(Sprite sprite)
+    {
+        if (sprite == null)
+        {
+            return;
+        }
+
+        if (background == null)
+        {
+            background = GetComponent<Image>();
+        }
+
+        if (background == null)
+        {
+            background = gameObject.AddComponent<Image>();
+        }
+
+        if (button == null)
+        {
+            button = GetComponent<Button>();
+        }
+
+        RuntimeUiVisuals.ApplyUndimmedButton(button, background, sprite);
+    }
 
     private void Awake()
     {
@@ -86,7 +107,7 @@ public sealed class CannonAmmoButtonUI : MonoBehaviour
 
             if (background != null)
             {
-                background.color = unavailableColor;
+                background.color = Color.white;
             }
 
             return;
@@ -103,26 +124,34 @@ public sealed class CannonAmmoButtonUI : MonoBehaviour
         if (ammoNameText != null)
         {
             ammoNameText.text = ammo.DisplayName;
+            ammoNameText.color = !isAvailable
+                ? UnavailableTextColor
+                : isSelected
+                    ? SelectedTextColor
+                    : Color.white;
         }
 
         if (ammoCountText != null)
         {
             ammoCountText.text = $"{currentCount} / {maximumCount}";
+            ammoCountText.color = !isAvailable
+                ? UnavailableTextColor
+                : isSelected
+                    ? SelectedTextColor
+                    : Color.white;
         }
 
         if (ammoIcon != null)
         {
             ammoIcon.sprite = ammo.Icon;
             ammoIcon.enabled = ammo.Icon != null;
+            ammoIcon.color = Color.white;
+            ammoIcon.preserveAspect = true;
         }
 
         if (background != null)
         {
-            background.color = !isAvailable
-                ? unavailableColor
-                : isSelected
-                    ? selectedColor
-                    : normalColor;
+            background.color = Color.white;
         }
     }
 

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Button))]
 public sealed class CrewRosterEntry : MonoBehaviour
 {
-    [SerializeField] private Image portrait;
+    [SerializeField] private RawImage portrait;
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private Image healthFill;
     [SerializeField] private TMP_Text healthText;
@@ -19,8 +19,31 @@ public sealed class CrewRosterEntry : MonoBehaviour
     private CrewCommandController commandController;
     private string lastStatus;
     private bool healthWasInitialized;
+    private RuntimeWorldIconCamera portraitCamera;
 
     public CrewUnit Unit => unit;
+
+    internal void ApplyButtonSprite(Sprite sprite)
+    {
+        if (sprite == null)
+        {
+            return;
+        }
+
+        Image background = GetComponent<Image>();
+
+        if (background == null)
+        {
+            background = gameObject.AddComponent<Image>();
+        }
+
+        if (button == null)
+        {
+            button = GetComponent<Button>();
+        }
+
+        RuntimeUiVisuals.ApplyUndimmedButton(button, background, sprite);
+    }
 
     private void Awake()
     {
@@ -45,7 +68,7 @@ public sealed class CrewRosterEntry : MonoBehaviour
         {
             background = gameObject.AddComponent<Image>();
         }
-        background.color = new Color(0.10f, 0.12f, 0.16f, 0.96f);
+        background.color = Color.white;
 
         LayoutElement layout = GetComponent<LayoutElement>();
         if (layout == null)
@@ -59,7 +82,7 @@ public sealed class CrewRosterEntry : MonoBehaviour
             new Color(1f, 0.76f, 0.16f, 0.32f)).gameObject;
         Stretch((RectTransform)selectionHighlight.transform, 0f);
 
-        portrait = CreateImage("Portrait", transform, new Color(0.34f, 0.40f, 0.48f, 1f));
+        portrait = CreateRawImage("Portrait", transform);
         SetRect(portrait.rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f),
             new Vector2(48f, 48f), new Vector2(34f, 0f), new Vector2(0.5f, 0.5f));
 
@@ -106,9 +129,13 @@ public sealed class CrewRosterEntry : MonoBehaviour
 
         CrewUnit.SelectionChanged += HandleSelectionChanged;
 
+        EnsurePortraitCamera();
+
         if (nameText != null)
         {
-            nameText.text = unit != null ? unit.name : "Unknown";
+            nameText.text = unit != null
+                ? unit.DisplayName
+                : CrewNameGenerator.DefaultName;
         }
 
         RefreshHealth();
@@ -264,6 +291,12 @@ public sealed class CrewRosterEntry : MonoBehaviour
     {
         Unsubscribe();
 
+        if (portraitCamera != null)
+        {
+            portraitCamera.Dispose();
+            portraitCamera = null;
+        }
+
         if (button != null)
         {
             button.onClick.RemoveListener(HandleClick);
@@ -284,6 +317,33 @@ public sealed class CrewRosterEntry : MonoBehaviour
         Image image = rect.gameObject.AddComponent<Image>();
         image.color = color;
         return image;
+    }
+
+    private static RawImage CreateRawImage(string objectName, Transform parent)
+    {
+        RectTransform rect = CreateRect(objectName, parent);
+        RawImage image = rect.gameObject.AddComponent<RawImage>();
+        image.color = Color.white;
+        image.raycastTarget = false;
+        return image;
+    }
+
+    private void EnsurePortraitCamera()
+    {
+        Transform cameraTarget = unit != null ? unit.transform : null;
+
+        if (portraitCamera == null)
+        {
+            portraitCamera = RuntimeWorldIconCamera.Create(
+                $"{name}_PortraitCamera",
+                portrait,
+                cameraTarget,
+                0.65f
+            );
+            return;
+        }
+
+        portraitCamera.SetTarget(cameraTarget);
     }
 
     private static TMP_Text CreateText(string objectName, Transform parent, float size,

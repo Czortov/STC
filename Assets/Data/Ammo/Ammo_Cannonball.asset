@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Ammo_Cannonball
   m_EditorClassIdentifier: Assembly-CSharp::CannonballAmmoDefinition
   displayName: "\u042F\u0434\u0440\u043E"
-  icon: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  icon: {fileID: 21300000, guid: b51d22baf4b51274fb24ac612c0c94a2, type: 3}
   projectileSpeed: 6
   projectileLifetime: 5
   projectileSize: 0.18

@@ -15,6 +15,10 @@ public sealed class CrewUnit : MonoBehaviour
 
     public static IReadOnlyCollection<CrewUnit> ActiveUnits => activeUnits;
 
+    [Header("Identity")]
+
+    [SerializeField] private string displayName;
+
     [Header("Selection")]
 
     [SerializeField] private Color normalColor =
@@ -70,6 +74,10 @@ public sealed class CrewUnit : MonoBehaviour
     public bool IsSelected { get; private set; }
     public bool IsMoving => movementCoroutine != null;
     public bool IsRepairing => wasRepairing;
+    public string DisplayName =>
+        string.IsNullOrWhiteSpace(displayName)
+            ? CrewNameGenerator.DefaultName
+            : displayName;
 
     public ShipCellView CurrentCell { get; private set; }
     public ShipCellView TargetCell { get; private set; }
@@ -102,10 +110,26 @@ public sealed class CrewUnit : MonoBehaviour
 
     private void Awake()
     {
+        EnsureDisplayName();
+
         unitRenderer = GetComponent<SpriteRenderer>();
         unitRenderer.sortingOrder = sortingOrder;
 
         ApplySelectionVisual();
+    }
+
+    private void EnsureDisplayName()
+    {
+        if (!string.IsNullOrWhiteSpace(displayName))
+        {
+            return;
+        }
+
+        ShipIdentity ship = GetComponentInParent<ShipIdentity>();
+
+        displayName = ship != null
+            ? CrewNameGenerator.Generate(ship.Team)
+            : CrewNameGenerator.DefaultName;
     }
 
     private void OnEnable()

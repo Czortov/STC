@@ -16,6 +16,10 @@ public sealed class PlayerCannonPanel : MonoBehaviour
     [SerializeField] private RectTransform content;
     [SerializeField] private BottomUpGridLayoutGroup grid;
 
+    [Header("Runtime UI Theme")]
+    [SerializeField] private Sprite panelSprite;
+    [SerializeField] private Sprite buttonSprite;
+
     [Header("Layout")]
     [SerializeField] private Vector2 normalCellSize = new Vector2(160f, 100f);
     [SerializeField] private Vector2 compactCellSize = new Vector2(80f, 50f);
@@ -99,6 +103,7 @@ public sealed class PlayerCannonPanel : MonoBehaviour
         }
 
         card.name = cannon.Room != null ? $"CannonCard_{cannon.Room.Id}" : "CannonCard";
+        card.ApplyButtonSprite(buttonSprite);
         card.Bind(cannon, targetingController);
         cards.Add(cannon, card);
         RebuildLayout();
@@ -195,6 +200,7 @@ public sealed class PlayerCannonPanel : MonoBehaviour
         }
 
         Image background = CreateImage("Background", transform, new Color(0.02f, 0.03f, 0.05f, 0.9f));
+        RuntimeUiVisuals.ApplySlicedSprite(background, panelSprite);
         Stretch(background.rectTransform, 0f);
         background.raycastTarget = false;
 
@@ -247,4 +253,5 @@ public sealed class PlayerCannonPanel : MonoBehaviour
         rect.offsetMin = new Vector2(inset, inset);
         rect.offsetMax = new Vector2(-inset, -inset);
     }
+
 }

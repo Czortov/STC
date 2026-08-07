@@ -14,7 +14,8 @@ public sealed class CannonCardUI : MonoBehaviour
     [Header("Optional authored view")]
     [SerializeField] private Image background;
     [SerializeField] private Image selectionHighlight;
-    [SerializeField] private Image cannonIcon;
+    [SerializeField] private RawImage cannonIcon;
+    [SerializeField] private Image loadedAmmoIcon;
     [SerializeField] private TMP_Text cannonNameText;
     [SerializeField] private TMP_Text ammoCountText;
     [SerializeField] private Image reloadFill;
@@ -26,8 +27,21 @@ public sealed class CannonCardUI : MonoBehaviour
     private string lastName;
     private string lastAmmo;
     private bool lastSelected;
+    private RuntimeWorldIconCamera iconCamera;
 
     public CannonSystemRuntime Cannon => cannon;
+
+    internal void ApplyButtonSprite(Sprite sprite)
+    {
+        if (sprite == null)
+        {
+            return;
+        }
+
+        background = GetComponent<Image>() ?? gameObject.AddComponent<Image>();
+        button = GetComponent<Button>() ?? gameObject.AddComponent<Button>();
+        RuntimeUiVisuals.ApplyUndimmedButton(button, background, sprite);
+    }
 
     private void Awake()
     {
@@ -59,6 +73,7 @@ public sealed class CannonCardUI : MonoBehaviour
         Unsubscribe();
         cannon = target;
         targetingController = controller;
+        EnsureIconCamera();
         Subscribe();
         RefreshAll();
     }
@@ -74,6 +89,10 @@ public sealed class CannonCardUI : MonoBehaviour
 
         RectTransform iconRect = cannonIcon.rectTransform;
         iconRect.sizeDelta = compact ? new Vector2(24f, 24f) : new Vector2(42f, 42f);
+
+        loadedAmmoIcon.rectTransform.sizeDelta = compact
+            ? new Vector2(20f, 20f)
+            : new Vector2(32f, 32f);
 
         float textLeft = compact ? 38f : 58f;
         SetHorizontalInsets(cannonNameText.rectTransform, textLeft, 5f);
@@ -139,7 +158,7 @@ public sealed class CannonCardUI : MonoBehaviour
             return;
         }
 
-        string cannonName = cannon.Room != null ? $"Пушка {cannon.Room.Id}" : "Пушка";
+        string cannonName = "Пушка";
         string ammoName = cannon.LoadedAmmo != null ? cannon.LoadedAmmo.DisplayName : "Нет боеприпаса";
         string ammo = displayMode == CannonCardDisplayMode.Compact
             ? cannon.CurrentAmmoCount.ToString()
@@ -155,6 +174,8 @@ public sealed class CannonCardUI : MonoBehaviour
             lastAmmo = ammo;
             ammoCountText.text = ammo;
         }
+
+        RefreshLoadedAmmoIcon();
 
         RefreshReloadBar();
         RefreshSelection();
@@ -213,7 +234,7 @@ public sealed class CannonCardUI : MonoBehaviour
         }
 
         background = GetComponent<Image>() ?? gameObject.AddComponent<Image>();
-        background.color = new Color(0.035f, 0.055f, 0.085f, 0.96f);
+        background.color = Color.white;
         button = GetComponent<Button>() ?? gameObject.AddComponent<Button>();
         button.targetGraphic = background;
 
@@ -221,9 +242,19 @@ public sealed class CannonCardUI : MonoBehaviour
         Stretch(selectionHighlight.rectTransform, 2f);
         selectionHighlight.raycastTarget = false;
 
-        cannonIcon = CreateImage("CannonIcon", transform, new Color(0.72f, 0.75f, 0.78f, 1f));
+        cannonIcon = CreateRawImage("CannonIcon", transform);
         SetRect(cannonIcon.rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f),
             new Vector2(10f, 0f), new Vector2(42f, 42f), new Vector2(0f, 0.5f));
+
+        loadedAmmoIcon = CreateImage("LoadedAmmoIcon", transform, Color.white);
+        loadedAmmoIcon.preserveAspect = true;
+        loadedAmmoIcon.raycastTarget = false;
+        SetFixedRect(
+            loadedAmmoIcon.rectTransform,
+            new Vector2(1f, 0.72f),
+            new Vector2(32f, 32f),
+            new Vector2(-22f, 0f)
+        );
 
         cannonNameText = CreateText("CannonNameText", transform, TextAlignmentOptions.TopLeft);
         cannonNameText.enableAutoSizing = true;
@@ -270,6 +301,84 @@ public sealed class CannonCardUI : MonoBehaviour
         Image image = rect.gameObject.AddComponent<Image>();
         image.color = color;
         return image;
+    }
+
+    private static RawImage CreateRawImage(string objectName, Transform parent)
+    {
+        RectTransform rect = CreateRect(objectName, parent);
+        RawImage image = rect.gameObject.AddComponent<RawImage>();
+        image.color = Color.white;
+        image.raycastTarget = false;
+        return image;
+    }
+
+    private void EnsureIconCamera()
+    {
+        Transform cameraTarget = null;
+
+        if (cannon != null)
+        {
+            cameraTarget = cannon.Room != null &&
+                           cannon.Room.ControlPointCell != null
+                ? cannon.Room.ControlPointCell.transform
+                : cannon.transform;
+        }
+
+        if (iconCamera == null)
+        {
+            iconCamera = RuntimeWorldIconCamera.Create(
+                $"{name}_IconCamera",
+                cannonIcon,
+                cameraTarget,
+                0.65f
+            );
+            return;
+        }
+
+        iconCamera.SetTarget(cameraTarget);
+    }
+
+    private void RefreshLoadedAmmoIcon()
+    {
+        if (loadedAmmoIcon == null)
+        {
+            return;
+        }
+
+        Sprite icon = cannon != null && cannon.LoadedAmmo != null
+            ? cannon.LoadedAmmo.Icon
+            : null;
+
+        loadedAmmoIcon.sprite = icon;
+        loadedAmmoIcon.enabled = icon != null;
+        loadedAmmoIcon.color = Color.white;
+    }
+
+    private static void SetFixedRect(
+        RectTransform rect,
+        Vector2 anchor,
+        Vector2 size,
+        Vector2 position)
+    {
+        rect.anchorMin = anchor;
+        rect.anchorMax = anchor;
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.sizeDelta = size;
+        rect.anchoredPosition = position;
+    }
+
+    private void OnDestroy()
+    {
+        if (button != null)
+        {
+            button.onClick.RemoveListener(HandleClick);
+        }
+
+        if (iconCamera != null)
+        {
+            iconCamera.Dispose();
+            iconCamera = null;
+        }
     }
 
     private static RectTransform CreateRect(string objectName, Transform parent)
