@@ -26,9 +26,6 @@ public sealed class ShipGenerator : MonoBehaviour
     [Min(0.1f)]
     [SerializeField] private float cellSize = 1f;
 
-    [Range(0f, 0.4f)]
-    [SerializeField] private float cellGap = 0.06f;
-
     [Min(1)]
     [SerializeField] private int defaultRoomHealth = 100;
 
@@ -63,6 +60,8 @@ public sealed class ShipGenerator : MonoBehaviour
 
     public IReadOnlyDictionary<int, ShipRoomRuntime>
         GeneratedRooms => generatedRooms;
+
+    public int LastVisualSeed { get; private set; }
 
     private void Start()
     {
@@ -116,6 +115,14 @@ public sealed class ShipGenerator : MonoBehaviour
 
         generatedRoot = rootObject.transform;
 
+        CreateHullVisual(shipData, hull);
+
+        LastVisualSeed = hull.VisualSeed;
+        System.Random visualRandom =
+            new System.Random(LastVisualSeed);
+
+        WarnAboutMissingVisuals(hull);
+
         Dictionary<int, ShipRoomBlueprint>
             roomBlueprints =
                 CreateRoomObjects(shipData);
@@ -123,7 +130,9 @@ public sealed class ShipGenerator : MonoBehaviour
         CreateCellObjects(
             shipData,
             roomBlueprints,
-            squareSprite
+            squareSprite,
+            hull,
+            visualRandom
         );
 
         ConfigureRoomColliders(
@@ -270,13 +279,200 @@ public sealed class ShipGenerator : MonoBehaviour
         return roomBlueprints;
     }
 
+    private void CreateHullVisual(
+        ShipBlueprintData shipData,
+        ShipHullDefinition hull)
+    {
+        if (hull.HullSprite == null)
+        {
+            Debug.LogWarning(
+                $"ShipGenerator: hull sprite is not assigned for " +
+                $"ship type {hull.ShipType}.",
+                hull
+            );
+
+            return;
+        }
+
+        GameObject visualsObject = new GameObject("Visuals");
+        visualsObject.transform.SetParent(generatedRoot, false);
+
+        GameObject hullObject = new GameObject("HullSprite");
+        hullObject.transform.SetParent(visualsObject.transform, false);
+
+        SpriteRenderer renderer =
+            hullObject.AddComponent<SpriteRenderer>();
+
+        renderer.sprite = hull.HullSprite;
+        renderer.color = Color.white;
+        renderer.sortingOrder = hull.HullSortingOrder;
+
+        Vector2Int padding = hull.HullPaddingInCells;
+        Vector2 spriteSize = hull.HullSprite.bounds.size;
+        float desiredWidth =
+            (shipData.Width + Mathf.Max(0, padding.x) * 2) *
+            cellSize;
+
+        float uniformScale = spriteSize.x > 0f
+            ? desiredWidth / spriteSize.x
+            : 1f;
+
+        float scaledHeight = spriteSize.y * uniformScale;
+        Vector3 matrixCenter = GetMatrixCenterLocalPosition(
+            shipData.Width,
+            shipData.Height
+        );
+
+        float matrixBottom =
+            matrixCenter.y - shipData.Height * cellSize * 0.5f;
+
+        float hullBottom =
+            matrixBottom - Mathf.Max(0, padding.y) * cellSize;
+
+        hullObject.transform.localPosition = new Vector3(
+            matrixCenter.x,
+            hullBottom + scaledHeight * 0.5f,
+            0f
+        );
+
+        hullObject.transform.localScale = new Vector3(
+            uniformScale,
+            uniformScale,
+            1f
+        );
+    }
+
+    private Vector3 GetMatrixCenterLocalPosition(int width, int height)
+    {
+        if (centerShip)
+        {
+            return Vector3.zero;
+        }
+
+        return new Vector3(
+            (width - 1) * cellSize * 0.5f,
+            (height - 1) * cellSize * 0.5f,
+            0f
+        );
+    }
+
+    private void WarnAboutMissingVisuals(ShipHullDefinition hull)
+    {
+        if (!ContainsSprite(hull.InteriorWallGroupOneSprites))
+        {
+            Debug.LogWarning(
+                $"ShipGenerator: {hull.ShipType} has no sprites in " +
+                "interior wall group 1. The color fallback will be used.",
+                hull
+            );
+        }
+
+        if (!ContainsSprite(hull.InteriorWallGroupTwoSprites))
+        {
+            Debug.LogWarning(
+                $"ShipGenerator: {hull.ShipType} has no sprites in " +
+                "interior wall group 2. The color fallback will be used.",
+                hull
+            );
+        }
+
+        if (!ContainsSprite(hull.ExteriorWallSprites))
+        {
+            Debug.LogWarning(
+                $"ShipGenerator: {hull.ShipType} has no exterior wall " +
+                "sprites. Exterior cells will remain transparent.",
+                hull
+            );
+        }
+
+        if (hull.LadderSprite == null)
+        {
+            Debug.LogWarning(
+                $"ShipGenerator: {hull.ShipType} has no ladder sprite. " +
+                "The procedural ladder fallback will be used.",
+                hull
+            );
+        }
+    }
+
+    private static bool ContainsSprite(IReadOnlyList<Sprite> sprites)
+    {
+        if (sprites == null)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < sprites.Count; i++)
+        {
+            if (sprites[i] != null)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static Sprite GetWallSprite(
+        IReadOnlyList<Sprite> sprites,
+        System.Random random)
+    {
+        if (sprites == null || random == null)
+        {
+            return null;
+        }
+
+        int validSpriteCount = 0;
+
+        for (int i = 0; i < sprites.Count; i++)
+        {
+            if (sprites[i] != null)
+            {
+                validSpriteCount++;
+            }
+        }
+
+        if (validSpriteCount == 0)
+        {
+            return null;
+        }
+
+        int selectedIndex = random.Next(validSpriteCount);
+
+        for (int i = 0; i < sprites.Count; i++)
+        {
+            if (sprites[i] == null)
+            {
+                continue;
+            }
+
+            if (selectedIndex == 0)
+            {
+                return sprites[i];
+            }
+
+            selectedIndex--;
+        }
+
+        return null;
+    }
+
     private void CreateCellObjects(
         ShipBlueprintData shipData,
         Dictionary<int, ShipRoomBlueprint> roomBlueprints,
-        Sprite squareSprite)
+        Sprite squareSprite,
+        ShipHullDefinition hull,
+        System.Random visualRandom)
     {
+        HashSet<ShipModuleType> missingModuleVisualWarnings =
+            new HashSet<ShipModuleType>();
+
         for (int y = 0; y < shipData.Height; y++)
         {
+            int interiorWallGroupIndex = visualRandom.Next(2);
+            IReadOnlyList<Sprite> interiorWallSprites =
+                hull.GetInteriorWallSprites(interiorWallGroupIndex);
+
             for (int x = 0; x < shipData.Width; x++)
             {
                 ShipCellBlueprint cellBlueprint =
@@ -333,17 +529,55 @@ public sealed class ShipGenerator : MonoBehaviour
                 ShipCellView cellView =
                     cellObject.AddComponent<ShipCellView>();
 
+                ShipModuleVisualEntry moduleVisual = null;
+                Sprite moduleSprite = null;
+
+                if (cellBlueprint.ModuleType != ShipModuleType.None &&
+                    (!hull.TryGetModuleVisual(
+                         cellBlueprint.ModuleType,
+                         out moduleVisual) ||
+                     !moduleVisual.TryGetSprite(
+                         visualRandom,
+                         out moduleSprite)))
+                {
+                    moduleVisual = null;
+
+                    if (missingModuleVisualWarnings.Add(
+                            cellBlueprint.ModuleType))
+                    {
+                        Debug.LogWarning(
+                            $"ShipGenerator: {hull.ShipType} has no " +
+                            $"sprite for module " +
+                            $"{cellBlueprint.ModuleType}. " +
+                            "The placeholder will be used.",
+                            hull
+                        );
+                    }
+                }
+
                 cellView.Initialize(
                     cellBlueprint,
                     roomRuntime,
                     isControlPoint,
                     squareSprite,
+                    GetWallSprite(
+                        cellBlueprint.IsExterior
+                            ? hull.ExteriorWallSprites
+                            : interiorWallSprites,
+                        visualRandom
+                    ),
+                    moduleVisual,
+                    moduleSprite,
+                    hull.LadderSprite,
+                    hull.LadderSizeInCells,
+                    hull.LadderOffsetInCells,
+                    hull.LadderSortingOrder,
                     cellSize,
-                    cellGap,
                     GetRoomColor(cellBlueprint.RoomId),
                     borderColor,
                     GetModuleColor(cellBlueprint.ModuleType),
-                    ladderColor
+                    ladderColor,
+                    hull.WallSortingOrder
                 );
 
                 roomRuntime.RegisterCell(cellView);
@@ -485,7 +719,7 @@ public sealed class ShipGenerator : MonoBehaviour
             $"Cell_{cell.Coordinates.x}_" +
             $"{cell.Coordinates.y}";
 
-        if (cell.HullType == HullCellType.Ladder)
+        if (cell.IsLadder)
         {
             return $"{name}_Ladder";
         }

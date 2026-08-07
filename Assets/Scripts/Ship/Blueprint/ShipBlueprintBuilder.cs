@@ -230,7 +230,9 @@ public static class ShipBlueprintBuilder
 
                 if (symbol != '0' &&
                     symbol != '1' &&
-                    symbol != '2')
+                    symbol != '2' &&
+                    symbol != '3' &&
+                    symbol != '4')
                 {
                     errors.Add(
                         $"Недопустимый символ '{symbol}' " +
@@ -325,20 +327,18 @@ public static class ShipBlueprintBuilder
         {
             for (int x = 0; x < width; x++)
             {
-                if (hullTypes[x, y] != HullCellType.Ladder)
+                if (!hullTypes[x, y].IsLadder())
                 {
                     continue;
                 }
 
                 bool ladderAbove =
                     y > 0 &&
-                    hullTypes[x, y - 1] ==
-                    HullCellType.Ladder;
+                    hullTypes[x, y - 1].IsLadder();
 
                 bool ladderBelow =
                     y < height - 1 &&
-                    hullTypes[x, y + 1] ==
-                    HullCellType.Ladder;
+                    hullTypes[x, y + 1].IsLadder();
 
                 if (!ladderAbove && !ladderBelow)
                 {
@@ -412,7 +412,7 @@ public static class ShipBlueprintBuilder
                         continue;
                     }
 
-                    if (hullType == HullCellType.Ladder &&
+                    if (hullType.IsLadder() &&
                         moduleType != ShipModuleType.None)
                     {
                         errors.Add(

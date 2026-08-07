@@ -12,14 +12,67 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e6037d16d3b64d4a9d4f345c91fc8bc, type: 3}
   m_Name: BrigHull
   m_EditorClassIdentifier: Assembly-CSharp::ShipHullDefinition
+  shipType: 0
   hullName: Brig
-  hullMatrix: '120000000
+  hullMatrix: '240000000
 
-    121111211
+    132222422
 
-    111111210
+    111111310
 
-    001111200'
+    001111300'
+  hullSprite: {fileID: 21300000, guid: b45b027ad5ae34c44854109bfaf703ad, type: 3}
+  interiorWallGroupOneSprites:
+  - {fileID: 21300000, guid: ac5804a1a5c02ed41923ec896bf563e1, type: 3}
+  - {fileID: 21300000, guid: 9470e3b428c98e146bdc02d1d03f8a02, type: 3}
+  - {fileID: 21300000, guid: 6884b2e09352f72429033baedc01c7b3, type: 3}
+  interiorWallGroupTwoSprites:
+  - {fileID: 21300000, guid: 4936360fcd501e44bbb3c408db902cca, type: 3}
+  - {fileID: 21300000, guid: 03545916da22bde418eb8c7be336f6bb, type: 3}
+  - {fileID: 21300000, guid: 6710e30afe5c63b41a8d6c6d5481943d, type: 3}
+  exteriorWallSprites:
+  - {fileID: 21300000, guid: a1111111111111111111111111111111, type: 3}
+  - {fileID: 21300000, guid: a2222222222222222222222222222222, type: 3}
+  moduleVisuals:
+  - moduleType: 1
+    sprites:
+    - {fileID: 21300000, guid: 4660244ab74722d4d81cc4fe5750d38f, type: 3}
+    sizeInCells: {x: 1, y: 1}
+    offsetInCells: {x: 0, y: 0}
+    sortingOrder: -5
+  - moduleType: 2
+    sprites:
+    - {fileID: 9222143872520680919, guid: 6c04fae2ed2cc4043b8a16fa23a64b7f, type: 3}
+    - {fileID: -2504845158645026739, guid: 6c04fae2ed2cc4043b8a16fa23a64b7f, type: 3}
+    sizeInCells: {x: 0.6, y: 0.65}
+    offsetInCells: {x: 0, y: -0.1}
+    sortingOrder: -5
+  - moduleType: 3
+    sprites:
+    - {fileID: 21300000, guid: e3fbdb56221d431448b9e2c2e17e2e92, type: 3}
+    sizeInCells: {x: 1, y: 1}
+    offsetInCells: {x: 0, y: 0}
+    sortingOrder: -5
+  - moduleType: 5
+    sprites:
+    - {fileID: 21300000, guid: 1b55b5aeef343f543ab882883dc69586, type: 3}
+    sizeInCells: {x: 1, y: 1}
+    offsetInCells: {x: 0, y: 0}
+    sortingOrder: -5
+  - moduleType: 6
+    sprites:
+    - {fileID: 21300000, guid: 35c206c8b9f71984fb9b330ba80e2dbe, type: 3}
+    sizeInCells: {x: 1, y: 1}
+    offsetInCells: {x: 0, y: -0.05}
+    sortingOrder: -5
+  ladderSprite: {fileID: 21300000, guid: 72ee33345d7452e4bbdff5283f77aebb, type: 3}
+  ladderSizeInCells: {x: 1, y: 1}
+  ladderOffsetInCells: {x: 0, y: 0}
+  ladderSortingOrder: -5
+  hullPaddingInCells: {x: 1, y: 1}
+  hullSortingOrder: -20
+  wallSortingOrder: -10
+  visualSeed: 12345
   availableLayouts:
   - {fileID: 11400000, guid: b090795e5679dbe48be45667c52f0308, type: 2}
   - {fileID: 11400000, guid: f1d5193012084ff479026946fa3a2d9e, type: 2}

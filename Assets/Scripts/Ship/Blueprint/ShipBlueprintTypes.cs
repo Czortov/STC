@@ -4,8 +4,42 @@ using UnityEngine;
 public enum HullCellType
 {
     None = 0,
-    Floor = 1,
-    Ladder = 2
+    InteriorRoom = 1,
+    ExteriorRoom = 2,
+    InteriorLadder = 3,
+    ExteriorLadder = 4
+}
+
+public enum ShipType
+{
+    Brig = 0
+}
+
+public static class HullCellTypeRules
+{
+    public static bool IsRoom(this HullCellType cellType)
+    {
+        return cellType == HullCellType.InteriorRoom ||
+               cellType == HullCellType.ExteriorRoom;
+    }
+
+    public static bool IsLadder(this HullCellType cellType)
+    {
+        return cellType == HullCellType.InteriorLadder ||
+               cellType == HullCellType.ExteriorLadder;
+    }
+
+    public static bool IsInterior(this HullCellType cellType)
+    {
+        return cellType == HullCellType.InteriorRoom ||
+               cellType == HullCellType.InteriorLadder;
+    }
+
+    public static bool IsExterior(this HullCellType cellType)
+    {
+        return cellType == HullCellType.ExteriorRoom ||
+               cellType == HullCellType.ExteriorLadder;
+    }
 }
 
 public enum ShipModuleType
@@ -44,7 +78,10 @@ public sealed class ShipCellBlueprint
     public int RoomId { get; }
 
     public bool Exists => HullType != HullCellType.None;
-    public bool IsLadder => HullType == HullCellType.Ladder;
+    public bool IsRoom => HullType.IsRoom();
+    public bool IsLadder => HullType.IsLadder();
+    public bool IsInterior => HullType.IsInterior();
+    public bool IsExterior => HullType.IsExterior();
 
     public ShipCellBlueprint(
         Vector2Int coordinates,

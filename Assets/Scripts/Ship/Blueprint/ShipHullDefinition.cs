@@ -1,32 +1,209 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public sealed class ShipModuleVisualEntry
+{
+    [SerializeField] private ShipModuleType moduleType;
+    [SerializeField] private Sprite[] sprites;
+    [SerializeField] private Vector2 sizeInCells = Vector2.one;
+    [SerializeField] private Vector2 offsetInCells;
+    [SerializeField] private int sortingOrder = -5;
+
+    public ShipModuleType ModuleType => moduleType;
+    public Vector2 SizeInCells => new Vector2(
+        Mathf.Max(0.01f, sizeInCells.x),
+        Mathf.Max(0.01f, sizeInCells.y)
+    );
+    public Vector2 OffsetInCells => offsetInCells;
+    public int SortingOrder => sortingOrder;
+
+    public bool TryGetSprite(
+        System.Random random,
+        out Sprite selectedSprite)
+    {
+        selectedSprite = null;
+
+        if (sprites == null || random == null)
+        {
+            return false;
+        }
+
+        int validSpriteCount = 0;
+
+        for (int i = 0; i < sprites.Length; i++)
+        {
+            if (sprites[i] != null)
+            {
+                validSpriteCount++;
+            }
+        }
+
+        if (validSpriteCount == 0)
+        {
+            return false;
+        }
+
+        int selectedIndex = random.Next(validSpriteCount);
+
+        for (int i = 0; i < sprites.Length; i++)
+        {
+            if (sprites[i] == null)
+            {
+                continue;
+            }
+
+            if (selectedIndex == 0)
+            {
+                selectedSprite = sprites[i];
+                return true;
+            }
+
+            selectedIndex--;
+        }
+
+        return false;
+    }
+}
+
 [CreateAssetMenu(
     fileName = "NewShipHull",
     menuName = "Pirates/Ships/Hull Definition")]
 public sealed class ShipHullDefinition : ScriptableObject
 {
+    [Header("Identity")]
+    [SerializeField] private ShipType shipType = ShipType.Brig;
     [SerializeField] private string hullName = "Brig";
 
-    [Tooltip("0 — клетки нет, 1 — обычная клетка, 2 — лестница.")]
+    [Tooltip(
+        "0 - empty, 1 - interior room, 2 - exterior room, " +
+        "3 - interior ladder, 4 - exterior ladder.")]
     [TextArea(4, 12)]
     [SerializeField] private string hullMatrix =
-        "120000000\n" +
-        "121111211\n" +
-        "111111210\n" +
-        "001111200";
+        "240000000\n" +
+        "132222422\n" +
+        "111111310\n" +
+        "001111300";
+
+    [Header("Visuals")]
+    [SerializeField] private Sprite hullSprite;
+    [SerializeField] private Sprite[] interiorWallGroupOneSprites;
+    [SerializeField] private Sprite[] interiorWallGroupTwoSprites;
+    [SerializeField] private Sprite[] exteriorWallSprites;
+    [SerializeField] private ShipModuleVisualEntry[] moduleVisuals;
+    [SerializeField] private Sprite ladderSprite;
+    [SerializeField] private Vector2 ladderSizeInCells = Vector2.one;
+    [SerializeField] private Vector2 ladderOffsetInCells;
+    [SerializeField] private int ladderSortingOrder = -5;
+
+    [Tooltip(
+        "X is the guaranteed hull padding on the left and right. " +
+        "Y is the guaranteed bottom padding. The top extent follows " +
+        "the hull sprite aspect ratio.")]
+    [SerializeField] private Vector2Int hullPaddingInCells =
+        new Vector2Int(1, 1);
+
+    [SerializeField] private int hullSortingOrder = -20;
+    [SerializeField] private int wallSortingOrder = -10;
+    [SerializeField] private int visualSeed = 12345;
 
     [Header("Available modifications")]
-    [Tooltip("Модификации, которые можно установить на этот корпус.")]
     [SerializeField]
     private List<ShipLayoutDefinition> availableLayouts =
         new List<ShipLayoutDefinition>();
 
+    private Dictionary<ShipModuleType, ShipModuleVisualEntry>
+        moduleVisualLookup;
+
+    public ShipType ShipType => shipType;
     public string HullName => hullName;
     public string HullMatrix => hullMatrix;
+    public Sprite HullSprite => hullSprite;
+    public IReadOnlyList<Sprite> InteriorWallGroupOneSprites =>
+        interiorWallGroupOneSprites;
+    public IReadOnlyList<Sprite> InteriorWallGroupTwoSprites =>
+        interiorWallGroupTwoSprites;
+    public IReadOnlyList<Sprite> ExteriorWallSprites =>
+        exteriorWallSprites;
+    public IReadOnlyList<ShipModuleVisualEntry> ModuleVisuals =>
+        moduleVisuals;
+    public Sprite LadderSprite => ladderSprite;
+    public Vector2 LadderSizeInCells => new Vector2(
+        Mathf.Max(0.01f, ladderSizeInCells.x),
+        Mathf.Max(0.01f, ladderSizeInCells.y)
+    );
+    public Vector2 LadderOffsetInCells => ladderOffsetInCells;
+    public int LadderSortingOrder => ladderSortingOrder;
+    public Vector2Int HullPaddingInCells => hullPaddingInCells;
+    public int HullSortingOrder => hullSortingOrder;
+    public int WallSortingOrder => wallSortingOrder;
+    public int VisualSeed => visualSeed;
 
     public IReadOnlyList<ShipLayoutDefinition> AvailableLayouts =>
         availableLayouts;
+
+    public IReadOnlyList<Sprite> GetInteriorWallSprites(int groupIndex)
+    {
+        return groupIndex == 0
+            ? interiorWallGroupOneSprites
+            : interiorWallGroupTwoSprites;
+    }
+
+    public bool TryGetModuleVisual(
+        ShipModuleType moduleType,
+        out ShipModuleVisualEntry visual)
+    {
+        EnsureModuleVisualLookup();
+        return moduleVisualLookup.TryGetValue(moduleType, out visual);
+    }
+
+    private void OnEnable()
+    {
+        moduleVisualLookup = null;
+    }
+
+    private void OnValidate()
+    {
+        moduleVisualLookup = null;
+    }
+
+    private void EnsureModuleVisualLookup()
+    {
+        if (moduleVisualLookup != null)
+        {
+            return;
+        }
+
+        moduleVisualLookup =
+            new Dictionary<ShipModuleType, ShipModuleVisualEntry>();
+
+        if (moduleVisuals == null)
+        {
+            return;
+        }
+
+        foreach (ShipModuleVisualEntry visual in moduleVisuals)
+        {
+            if (visual == null ||
+                visual.ModuleType == ShipModuleType.None)
+            {
+                continue;
+            }
+
+            if (moduleVisualLookup.ContainsKey(visual.ModuleType))
+            {
+                Debug.LogWarning(
+                    $"Hull '{hullName}' contains more than one module " +
+                    $"visual for {visual.ModuleType}. The first one is used.",
+                    this
+                );
+
+                continue;
+            }
+
+            moduleVisualLookup.Add(visual.ModuleType, visual);
+        }
+    }
 
     public bool SupportsLayout(ShipLayoutDefinition layout)
     {
@@ -39,7 +216,7 @@ public sealed class ShipHullDefinition : ScriptableObject
         if (availableLayouts.Count == 0)
         {
             Debug.LogWarning(
-                $"У корпуса \"{hullName}\" нет доступных модификаций.",
+                $"Hull '{hullName}' has no available layouts.",
                 this
             );
 
@@ -54,8 +231,7 @@ public sealed class ShipHullDefinition : ScriptableObject
             if (layout == null)
             {
                 Debug.LogError(
-                    $"В списке модификаций корпуса \"{hullName}\" " +
-                    "есть пустой элемент.",
+                    $"Hull '{hullName}' contains an empty layout reference.",
                     this
                 );
 
@@ -65,8 +241,8 @@ public sealed class ShipHullDefinition : ScriptableObject
             if (!checkedLayouts.Add(layout))
             {
                 Debug.LogWarning(
-                    $"Модификация \"{layout.LayoutName}\" добавлена " +
-                    $"к корпусу \"{hullName}\" несколько раз.",
+                    $"Layout '{layout.LayoutName}' is assigned to hull " +
+                    $"'{hullName}' more than once.",
                     this
                 );
 
@@ -80,9 +256,8 @@ public sealed class ShipHullDefinition : ScriptableObject
                     out List<string> errors))
             {
                 Debug.Log(
-                    $"Корпус \"{hullName}\" совместим с модификацией " +
-                    $"\"{layout.LayoutName}\". " +
-                    $"Отсеков: {data.Rooms.Count}.",
+                    $"Hull '{hullName}' is compatible with layout " +
+                    $"'{layout.LayoutName}'. Rooms: {data.Rooms.Count}.",
                     this
                 );
 

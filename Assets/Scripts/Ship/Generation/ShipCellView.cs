@@ -24,8 +24,17 @@ public sealed class ShipCellView : MonoBehaviour
     public bool Exists =>
         HullType != HullCellType.None;
 
+    public bool IsRoom =>
+        HullType.IsRoom();
+
     public bool IsLadder =>
-        HullType == HullCellType.Ladder;
+        HullType.IsLadder();
+
+    public bool IsInterior =>
+        HullType.IsInterior();
+
+    public bool IsExterior =>
+        HullType.IsExterior();
 
     // Через лестницы можно прокладывать маршрут.
     public bool CanTraverse =>
@@ -33,8 +42,7 @@ public sealed class ShipCellView : MonoBehaviour
 
     // Но останавливаться экипаж может только на обычных клетках.
     public bool CanBeDestination =>
-        HullType == HullCellType.Floor ||
-        HullType == HullCellType.Ladder;
+        Exists;
 
     // Оставлено для совместимости со старым кодом.
     public bool IsWalkable =>
@@ -55,12 +63,19 @@ public sealed class ShipCellView : MonoBehaviour
         ShipRoomRuntime room,
         bool isControlPoint,
         Sprite squareSprite,
+        Sprite wallSprite,
+        ShipModuleVisualEntry moduleVisual,
+        Sprite moduleSprite,
+        Sprite ladderSprite,
+        Vector2 ladderSizeInCells,
+        Vector2 ladderOffsetInCells,
+        int ladderSortingOrder,
         float cellSize,
-        float cellGap,
         Color roomColor,
         Color borderColor,
         Color moduleColor,
-        Color ladderColor)
+        Color ladderColor,
+        int wallSortingOrder)
     {
         if (blueprint == null)
         {
@@ -86,36 +101,75 @@ public sealed class ShipCellView : MonoBehaviour
             allCells.Add(this);
         }
 
-        float innerCellSize = Mathf.Max(
-            0.05f,
-            cellSize - cellGap
-        );
+        if (!IsExterior)
+        {
+            CreatePart(
+                "Border",
+                squareSprite,
+                borderColor,
+                Vector2.zero,
+                new Vector2(cellSize, cellSize),
+                wallSortingOrder - 1
+            );
+        }
 
-        CreatePart(
-            "Border",
-            squareSprite,
-            borderColor,
-            Vector2.zero,
-            new Vector2(cellSize, cellSize),
-            0
-        );
-
-        CreatePart(
-            "Background",
-            squareSprite,
-            roomColor,
-            Vector2.zero,
-            new Vector2(innerCellSize, innerCellSize),
-            1
-        );
+        if (wallSprite != null)
+        {
+            CreatePart(
+                "BackgroundSprite",
+                wallSprite,
+                Color.white,
+                Vector2.zero,
+                new Vector2(cellSize, cellSize),
+                wallSortingOrder
+            );
+        }
+        else if (!IsExterior)
+        {
+            CreatePart(
+                "BackgroundFallback",
+                squareSprite,
+                roomColor,
+                Vector2.zero,
+                new Vector2(cellSize, cellSize),
+                wallSortingOrder
+            );
+        }
 
         if (IsLadder)
         {
-            CreateLadderVisual(
-                squareSprite,
-                ladderColor,
-                cellSize,
-                2
+            if (ladderSprite != null)
+            {
+                CreatePart(
+                    "LadderSprite",
+                    ladderSprite,
+                    Color.white,
+                    ladderOffsetInCells * cellSize,
+                    ladderSizeInCells * cellSize,
+                    ladderSortingOrder
+                );
+            }
+            else
+            {
+                CreateLadderVisual(
+                    squareSprite,
+                    ladderColor,
+                    cellSize,
+                    wallSortingOrder + 1
+                );
+            }
+        }
+        else if (ModuleType != ShipModuleType.None &&
+                 moduleVisual != null &&
+                 moduleSprite != null)
+        {
+            CreatePart(
+                "ModuleSprite",
+                moduleSprite,
+                Color.white,
+                moduleVisual.OffsetInCells * cellSize,
+                moduleVisual.SizeInCells * cellSize,
+                moduleVisual.SortingOrder
             );
         }
         else if (ModuleType != ShipModuleType.None)
@@ -128,11 +182,11 @@ public sealed class ShipCellView : MonoBehaviour
                 moduleColor,
                 Vector2.zero,
                 new Vector2(moduleSize, moduleSize),
-                2
+                wallSortingOrder + 1
             );
         }
 
-        if (IsControlPoint)
+        if (IsControlPoint && moduleSprite == null)
         {
             float markerSize = cellSize * 0.13f;
 
@@ -145,7 +199,7 @@ public sealed class ShipCellView : MonoBehaviour
                     cellSize * 0.28f
                 ),
                 new Vector2(markerSize, markerSize),
-                3
+                wallSortingOrder + 2
             );
         }
     }
@@ -289,12 +343,13 @@ public sealed class ShipCellView : MonoBehaviour
                 0f
             );
 
-        part.transform.localScale =
-            new Vector3(
-                size.x,
-                size.y,
-                1f
-            );
+        Vector2 spriteSize = sprite.bounds.size;
+
+        part.transform.localScale = new Vector3(
+            spriteSize.x > 0f ? size.x / spriteSize.x : 1f,
+            spriteSize.y > 0f ? size.y / spriteSize.y : 1f,
+            1f
+        );
 
         SpriteRenderer spriteRenderer =
             part.AddComponent<SpriteRenderer>();
