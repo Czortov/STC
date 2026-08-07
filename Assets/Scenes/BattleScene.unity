@@ -1796,6 +1796,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShipIdentity
   team: 1
   shipName: EnemyBrig
+  activeRudderOpponentReloadDurationMultiplier: 1.5
 --- !u!114 &812966294
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2274,6 +2275,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShipIdentity
   team: 0
   shipName: Player Brig
+  activeRudderOpponentReloadDurationMultiplier: 1.5
 --- !u!114 &1349167229
 MonoBehaviour:
   m_ObjectHideFlags: 0

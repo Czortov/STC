@@ -374,4 +374,5 @@ public sealed class EnemyCannonController : MonoBehaviour
             maximum
         );
     }
+
 }

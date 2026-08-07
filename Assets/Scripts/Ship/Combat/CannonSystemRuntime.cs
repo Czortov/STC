@@ -41,6 +41,7 @@ public sealed class CannonSystemRuntime : MonoBehaviour
 
     private ShipRoomRuntime room;
     private ShipHullHealth shipHullHealth;
+    private ShipIdentity opposingShip;
 
     private float reloadProgress;
     private bool isLoaded;
@@ -89,8 +90,14 @@ public sealed class CannonSystemRuntime : MonoBehaviour
                     ? loadedAmmo.ReloadDurationMultiplier
                     : 1f;
 
+            float opposingRudderMultiplier =
+                opposingShip != null
+                    ? opposingShip.OpponentReloadDurationMultiplier
+                    : 1f;
+
             return Mathf.Max(0.01f, baseReloadDuration) *
-                   Mathf.Max(0.01f, multiplier);
+                   Mathf.Max(0.01f, multiplier) *
+                   Mathf.Max(0.01f, opposingRudderMultiplier);
         }
     }
 
@@ -139,6 +146,8 @@ public sealed class CannonSystemRuntime : MonoBehaviour
         shipHullHealth =
             GetComponentInParent<ShipHullHealth>();
 
+        ResolveOpposingShip();
+
         InitializeAmmoStorage();
         ResolveStartingAmmo();
 
@@ -159,6 +168,30 @@ public sealed class CannonSystemRuntime : MonoBehaviour
         {
             allCannons.Add(this);
             CannonRegistered?.Invoke(this);
+        }
+    }
+
+    private void ResolveOpposingShip()
+    {
+        ShipIdentity ownShip =
+            GetComponentInParent<ShipIdentity>();
+
+        if (ownShip == null)
+        {
+            return;
+        }
+
+        ShipIdentity[] ships = FindObjectsByType<ShipIdentity>(
+            FindObjectsInactive.Include
+        );
+
+        foreach (ShipIdentity ship in ships)
+        {
+            if (ship != null && ship.Team != ownShip.Team)
+            {
+                opposingShip = ship;
+                return;
+            }
         }
     }
 

@@ -65,6 +65,8 @@ public sealed class CrewUnit : MonoBehaviour
         new List<ShipCellView>();
 
     private SpriteRenderer unitRenderer;
+    private CrewWalkSway walkSway;
+    private CrewRepairAnimation repairAnimation;
     private Coroutine movementCoroutine;
 
     private ShipRoomRuntime currentRepairRoom;
@@ -114,6 +116,8 @@ public sealed class CrewUnit : MonoBehaviour
 
         unitRenderer = GetComponent<SpriteRenderer>();
         unitRenderer.sortingOrder = sortingOrder;
+        walkSway = GetComponent<CrewWalkSway>();
+        repairAnimation = GetComponent<CrewRepairAnimation>();
 
         ApplySelectionVisual();
     }
@@ -142,6 +146,8 @@ public sealed class CrewUnit : MonoBehaviour
 
     private void OnDisable()
     {
+        SetRepairingState(false);
+
         if (activeUnits.Remove(this))
         {
             UnitUnregistered?.Invoke(this);
@@ -279,6 +285,8 @@ public sealed class CrewUnit : MonoBehaviour
             this
         );
 
+        walkSway?.SetMoving(true);
+
         movementCoroutine =
             StartCoroutine(MoveAlongPath(newPath));
     }
@@ -289,6 +297,7 @@ public sealed class CrewUnit : MonoBehaviour
         if (path == null || path.Count == 0)
         {
             movementCoroutine = null;
+            walkSway?.SetMoving(false);
             yield break;
         }
 
@@ -370,6 +379,7 @@ public sealed class CrewUnit : MonoBehaviour
     private void CompleteMovement()
     {
         movementCoroutine = null;
+        walkSway?.SetMoving(false);
 
         if (TargetCell == null)
         {
@@ -442,19 +452,19 @@ public sealed class CrewUnit : MonoBehaviour
         {
             currentRepairRoom = room;
             repairAccumulator = 0f;
-            wasRepairing = false;
+            SetRepairingState(false);
         }
 
         if (!room.IsDamaged)
         {
-            wasRepairing = false;
+            SetRepairingState(false);
             repairAccumulator = 0f;
             return;
         }
 
         if (!wasRepairing)
         {
-            wasRepairing = true;
+            SetRepairingState(true);
 
             Debug.Log(
                 $"{name} начал ремонтировать отсек {room.Id}. " +
@@ -483,7 +493,7 @@ public sealed class CrewUnit : MonoBehaviour
             return;
         }
 
-        wasRepairing = false;
+        SetRepairingState(false);
         repairAccumulator = 0f;
 
         Debug.Log(
@@ -496,7 +506,18 @@ public sealed class CrewUnit : MonoBehaviour
     {
         currentRepairRoom = null;
         repairAccumulator = 0f;
-        wasRepairing = false;
+        SetRepairingState(false);
+    }
+
+    private void SetRepairingState(bool repairing)
+    {
+        if (wasRepairing == repairing)
+        {
+            return;
+        }
+
+        wasRepairing = repairing;
+        repairAnimation?.SetRepairing(repairing);
     }
 
     private bool TryDetectStartingCell()
@@ -611,6 +632,8 @@ public sealed class CrewUnit : MonoBehaviour
 
     private void StopMovementCoroutine()
     {
+        walkSway?.SetMoving(false);
+
         if (movementCoroutine == null)
         {
             return;
