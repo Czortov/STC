@@ -12,7 +12,8 @@ public enum HullCellType
 
 public enum ShipType
 {
-    Brig = 0
+    Brig = 0,
+    Sloop = 1
 }
 
 public static class HullCellTypeRules

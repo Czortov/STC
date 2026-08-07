@@ -1,9 +1,19 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BattleSetup : MonoBehaviour
 {
     [SerializeField] private TMP_Text enemyNameText;
+    private const string MainMenuSceneName = "MainMenuScene";
+
+    private void Awake()
+    {
+        if (GetComponent<BattleEndController>() == null)
+        {
+            gameObject.AddComponent<BattleEndController>();
+        }
+    }
 
     private void Start()
     {
@@ -34,5 +44,11 @@ public class BattleSetup : MonoBehaviour
             default:
                 return "Не выбран";
         }
+    }
+
+    public void BackToMainMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(MainMenuSceneName);
     }
 }

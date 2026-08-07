@@ -113,10 +113,8 @@ public sealed class ShipHullDefinition : ScriptableObject
     [SerializeField] private int wallSortingOrder = -10;
     [SerializeField] private int visualSeed = 12345;
 
-    [Header("Available modifications")]
-    [SerializeField]
-    private List<ShipLayoutDefinition> availableLayouts =
-        new List<ShipLayoutDefinition>();
+    private IReadOnlyList<ShipLayoutDefinition> availableLayouts =
+        System.Array.Empty<ShipLayoutDefinition>();
 
     private Dictionary<ShipModuleType, ShipModuleVisualEntry>
         moduleVisualLookup;
@@ -142,6 +140,13 @@ public sealed class ShipHullDefinition : ScriptableObject
 
     public IReadOnlyList<ShipLayoutDefinition> AvailableLayouts =>
         availableLayouts;
+
+    public void ConfigureAvailableLayouts(
+        IReadOnlyList<ShipLayoutDefinition> layouts)
+    {
+        availableLayouts =
+            layouts ?? System.Array.Empty<ShipLayoutDefinition>();
+    }
 
     public IReadOnlyList<Sprite> GetInteriorWallSprites(int groupIndex)
     {
@@ -208,7 +213,20 @@ public sealed class ShipHullDefinition : ScriptableObject
 
     public bool SupportsLayout(ShipLayoutDefinition layout)
     {
-        return layout != null && availableLayouts.Contains(layout);
+        if (layout == null || availableLayouts == null)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < availableLayouts.Count; i++)
+        {
+            if (availableLayouts[i] == layout)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     [ContextMenu("Validate Available Layouts")]

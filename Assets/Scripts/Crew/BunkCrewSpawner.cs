@@ -1,10 +1,13 @@
 using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 [DisallowMultipleComponent]
 public sealed class BunkCrewSpawner : MonoBehaviour
 {
+    public event Action<BunkCrewSpawner> SpawnCompleted;
+
     [Header("Crew")]
 
     [SerializeField] private CrewUnit crewPrefab;
@@ -32,6 +35,8 @@ public sealed class BunkCrewSpawner : MonoBehaviour
 
     public IReadOnlyList<CrewUnit> SpawnedCrew =>
         spawnedCrew;
+
+    public bool HasSpawned => hasSpawned;
 
     private IEnumerator Start()
     {
@@ -206,6 +211,7 @@ public sealed class BunkCrewSpawner : MonoBehaviour
         }
 
         hasSpawned = true;
+        SpawnCompleted?.Invoke(this);
 
         Debug.Log(
             $"{name}: создано членов экипажа: " +

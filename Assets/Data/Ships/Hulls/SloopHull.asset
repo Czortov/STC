@@ -10,18 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0e6037d16d3b64d4a9d4f345c91fc8bc, type: 3}
-  m_Name: BrigHull
+  m_Name: SloopHull
   m_EditorClassIdentifier: Assembly-CSharp::ShipHullDefinition
-  shipType: 0
-  hullName: Brig
-  hullMatrix: '240000000
+  shipType: 1
+  hullName: Sloop
+  hullMatrix: '2422242222
 
-    132222422
-
-    111111310
-
-    001111300'
-  hullSprite: {fileID: 21300000, guid: b45b027ad5ae34c44854109bfaf703ad, type: 3}
+    0311131110'
+  hullSprite: {fileID: 21300000, guid: 81b3ff0df4957ec44b9f34e1c9490500, type: 3}
   interiorWallGroupOneSprites:
   - {fileID: 21300000, guid: ac5804a1a5c02ed41923ec896bf563e1, type: 3}
   - {fileID: 21300000, guid: 9470e3b428c98e146bdc02d1d03f8a02, type: 3}
@@ -69,4 +65,4 @@ MonoBehaviour:
   hullBottomPaddingInCells: 1
   hullSortingOrder: -20
   wallSortingOrder: -10
-  visualSeed: 12345
+  visualSeed: 54321

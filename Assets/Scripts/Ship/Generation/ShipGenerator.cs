@@ -12,6 +12,9 @@ public sealed class ShipGenerator : MonoBehaviour
         "Включить после создания меню выбора корпуса и модификации.")]
     [SerializeField] private bool useRuntimeSelection;
 
+    [Tooltip("For runtime selection: use the enemy ship instead of the player ship.")]
+    [SerializeField] private bool useEnemyRuntimeSelection;
+
     [Tooltip(
         "Корпус для проверки генератора прямо из Inspector.")]
     [SerializeField] private ShipHullDefinition previewHull;
@@ -186,8 +189,13 @@ public sealed class ShipGenerator : MonoBehaviour
     {
         if (useRuntimeSelection)
         {
-            hull = ShipSelectionState.SelectedHull;
-            layout = ShipSelectionState.SelectedLayout;
+            hull = useEnemyRuntimeSelection
+                ? GameSession.EnemyHull
+                : GameSession.PlayerHull;
+
+            layout = useEnemyRuntimeSelection
+                ? GameSession.EnemyLayout
+                : GameSession.PlayerLayout;
 
             if (hull == null)
             {
