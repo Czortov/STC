@@ -10,6 +10,24 @@ public sealed class ShipCatalogEntry
 
     public ShipHullDefinition Hull => hull;
     public IReadOnlyList<ShipLayoutDefinition> Layouts => layouts;
+
+#if UNITY_EDITOR
+    public bool AddLayout(ShipLayoutDefinition layout)
+    {
+        if (layout == null || layouts.Contains(layout))
+        {
+            return false;
+        }
+
+        layouts.Add(layout);
+        return true;
+    }
+
+    public bool RemoveLayout(ShipLayoutDefinition layout)
+    {
+        return layout != null && layouts.Remove(layout);
+    }
+#endif
 }
 
 [CreateAssetMenu(
@@ -67,4 +85,52 @@ public sealed class ShipCatalogDefinition : ScriptableObject
     {
         ApplyToHulls();
     }
+
+#if UNITY_EDITOR
+    public bool AddLayout(
+        ShipHullDefinition hull,
+        ShipLayoutDefinition layout)
+    {
+        if (hull == null || layout == null || entries == null)
+        {
+            return false;
+        }
+
+        foreach (ShipCatalogEntry entry in entries)
+        {
+            if (entry?.Hull == hull && entry.AddLayout(layout))
+            {
+                ApplyToHulls();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public bool RemoveLayout(ShipLayoutDefinition layout)
+    {
+        if (layout == null || entries == null)
+        {
+            return false;
+        }
+
+        bool removed = false;
+
+        foreach (ShipCatalogEntry entry in entries)
+        {
+            if (entry != null)
+            {
+                removed |= entry.RemoveLayout(layout);
+            }
+        }
+
+        if (removed)
+        {
+            ApplyToHulls();
+        }
+
+        return removed;
+    }
+#endif
 }

@@ -1,12 +1,5 @@
-using UnityEngine;
-using UnityEngine.SceneManagement;
-
-public class EditorController : MonoBehaviour
+// Compatibility wrapper for the existing EditorScene component and its
+// serialized Back button event.
+public sealed class EditorController : ShipEditorController
 {
-    private const string MainMenuSceneName = "MainMenuScene";
-
-    public void BackToMainMenu()
-    {
-        SceneManager.LoadScene(MainMenuSceneName);
-    }
 }

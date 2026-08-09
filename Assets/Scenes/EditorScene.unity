@@ -572,6 +572,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 676ffacf9ce436b49a67eaf3b2de5fdb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EditorController
+  shipCatalog: {fileID: 11400000, guid: 9476a4f9bddf4791ae47aff4069da9be, type: 2}
+  moduleEntryPrefab: {fileID: 11400000, guid: 7d99c0d1c7ca4671aa981cb9836c61d9, type: 3}
+  previewPadding: 42
 --- !u!4 &1561508011
 Transform:
   m_ObjectHideFlags: 0
@@ -737,7 +740,7 @@ GameObject:
   - component: {fileID: 1976453006}
   - component: {fileID: 1976453005}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: EditorCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

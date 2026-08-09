@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: SloopCombatLayout
   m_EditorClassIdentifier: Assembly-CSharp::ShipLayoutDefinition
   layoutName: Combat Layout
+  shipType: 1
   roomMatrix: '1;0;050;0;2;030
 
     00;030;0;6;6;6;0'

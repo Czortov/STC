@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: BrigCombatLayout
   m_EditorClassIdentifier: Assembly-CSharp::ShipLayoutDefinition
   layoutName: Combat Layout
+  shipType: 0
   roomMatrix: '1;00000000
 
     2;0;0050;0;00

@@ -2,11 +2,14 @@ using UnityEngine;
 
 public sealed class CannonProjectile : MonoBehaviour
 {
+    private const string HitEffectResourcePath = "HitEffect";
     private const string OverviewHighlightLayerName = "OverviewHighlight";
     private const float OverviewHighlightScale = 8f;
 
     private static Texture2D projectileTexture;
     private static Sprite projectileSprite;
+    private static ProjectileHitEffect hitEffectPrefab;
+    private static bool attemptedToLoadHitEffect;
 
     private ShipRoomRuntime targetRoom;
     private CannonAmmoDefinition ammo;
@@ -206,9 +209,46 @@ public sealed class CannonProjectile : MonoBehaviour
                 targetRoom,
                 transform.position
             );
+
+            CreateHitEffect(transform.position);
         }
 
         Destroy(gameObject);
+    }
+
+    private void CreateHitEffect(Vector3 impactPosition)
+    {
+        ProjectileHitEffect prefab = GetHitEffectPrefab();
+
+        if (prefab == null)
+        {
+            Debug.LogError(
+                $"{name}: HitEffect Prefab is not assigned. " +
+                $"Place it at Resources/{HitEffectResourcePath}.prefab.",
+                this
+            );
+            return;
+        }
+
+        Instantiate(
+            prefab,
+            impactPosition,
+            Quaternion.identity
+        );
+    }
+
+    private static ProjectileHitEffect GetHitEffectPrefab()
+    {
+        if (!attemptedToLoadHitEffect)
+        {
+            attemptedToLoadHitEffect = true;
+            hitEffectPrefab =
+                Resources.Load<ProjectileHitEffect>(
+                    HitEffectResourcePath
+                );
+        }
+
+        return hitEffectPrefab;
     }
 
     private static Vector3 GetRoomWorldCenter(

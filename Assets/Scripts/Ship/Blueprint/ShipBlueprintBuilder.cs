@@ -10,6 +10,37 @@ public static class ShipBlueprintBuilder
         out ShipBlueprintData data,
         out List<string> errors)
     {
+        return TryCreateData(
+            hullDefinition,
+            layoutDefinition,
+            true,
+            out data,
+            out errors
+        );
+    }
+
+    public static bool TryCreateEditorData(
+        ShipHullDefinition hullDefinition,
+        ShipLayoutDefinition layoutDefinition,
+        out ShipBlueprintData data,
+        out List<string> errors)
+    {
+        return TryCreateData(
+            hullDefinition,
+            layoutDefinition,
+            false,
+            out data,
+            out errors
+        );
+    }
+
+    private static bool TryCreateData(
+        ShipHullDefinition hullDefinition,
+        ShipLayoutDefinition layoutDefinition,
+        bool requireCatalogMembership,
+        out ShipBlueprintData data,
+        out List<string> errors)
+    {
         data = null;
         errors = new List<string>();
 
@@ -28,7 +59,8 @@ public static class ShipBlueprintBuilder
             return false;
         }
 
-        if (!hullDefinition.SupportsLayout(layoutDefinition))
+        if (requireCatalogMembership &&
+            !hullDefinition.SupportsLayout(layoutDefinition))
         {
             errors.Add(
                 $"Модификация \"{layoutDefinition.LayoutName}\" " +
