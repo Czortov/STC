@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(ShipRoomRuntime))]
+[RequireComponent(typeof(AudioSource))]
 public sealed class CannonSystemRuntime : MonoBehaviour
 {
     public static event Action<CannonSystemRuntime> CannonRegistered;
@@ -45,6 +46,8 @@ public sealed class CannonSystemRuntime : MonoBehaviour
 
     private float reloadProgress;
     private bool isLoaded;
+
+    private AudioSource audioSource;
 
     public ShipRoomRuntime Room =>
         room;
@@ -142,6 +145,7 @@ public sealed class CannonSystemRuntime : MonoBehaviour
     private void Awake()
     {
         room = GetComponent<ShipRoomRuntime>();
+        audioSource = GetComponent<AudioSource>();
 
         shipHullHealth =
             GetComponentInParent<ShipHullHealth>();
@@ -385,6 +389,11 @@ public sealed class CannonSystemRuntime : MonoBehaviour
 
             return false;
         }
+        
+if (audioSource != null && audioSource.clip != null)
+{
+    audioSource.PlayOneShot(audioSource.clip);
+}
 
         ConsumeAmmo(loadedAmmo, 1);
 
